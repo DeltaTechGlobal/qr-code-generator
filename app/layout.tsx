@@ -1,16 +1,10 @@
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
 import './globals.css'
 import { ThemeProvider } from "@/components/theme-provider"
 
-const inter = Inter({ subsets: ['latin'] })
-
 export const metadata: Metadata = {
   title: 'QR Code Generator',
-  description: 'Generate customizable QR codes for various purposes',
-  icons: {
-    icon: '/qr-logo.png',
-  },
+  description: 'Generate custom QR codes for various purposes',
 }
 
 export default function RootLayout({
@@ -20,7 +14,8 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={inter.className}>
+      <head />
+      <body className="min-w-[600px] min-h-[600px] max-w-[800px] max-h-[800px]">
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

@@ -4,19 +4,10 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-  ...(process.env.NODE_ENV === 'production' ? {
-    basePath: '/qr-code-generator',
-    assetPrefix: '/qr-code-generator/',
-  } : {
-    basePath: '',
-    assetPrefix: '',
-  }),
-  webpack: (config, { isServer }) => {
-    // Suppress the warning
-    config.ignoreWarnings = [
-      { module: /node_modules\/node-fetch\/lib\/index\.js/ },
-      { module: /node_modules\/punycode\/punycode\.js/ },
-    ]
+  assetPrefix: './',
+  basePath: '',
+  webpack: (config) => {
+    config.resolve.fallback = { fs: false }
     return config
   },
 }

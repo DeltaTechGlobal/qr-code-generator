@@ -122,3 +122,41 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 Your Name - [@yourtwitter](https://twitter.com/yourtwitter)
 
 Project Link: [https://github.com/yourusername/qr-code-generator](https://github.com/yourusername/qr-code-generator)
+
+## Chrome Extension
+
+### Building the Extension
+
+1. Install dependencies:
+```bash
+yarn install
+```
+
+2. Build the extension:
+```bash
+yarn build-extension
+```
+
+3. The extension will be built in the `out` directory
+
+### Loading the Extension in Chrome
+
+1. Open Chrome and navigate to `chrome://extensions`
+2. Enable "Developer mode" in the top right
+3. Click "Load unpacked" and select the `out` directory
+4. The extension icon should appear in your Chrome toolbar
+
+### Publishing to Chrome Web Store
+
+1. Create a ZIP file of the `out` directory
+2. Create a developer account at the [Chrome Web Store Developer Dashboard](https://chrome.google.com/webstore/devconsole)
+3. Pay the one-time developer registration fee ($5)
+4. Click "New Item" and upload your ZIP file
+5. Fill in the store listing information:
+   - Description
+   - Screenshots
+   - Icon
+   - Category (Productivity recommended)
+6. Submit for review
+
+The review process typically takes a few business days.
