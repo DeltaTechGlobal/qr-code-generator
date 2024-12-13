@@ -11,7 +11,9 @@ import {
   FileText, 
   Share2, 
   Smartphone,
-  Globe
+  Globe,
+  AppWindow,
+  Store
 } from 'lucide-react'
 
 interface TypeSelectorProps {
@@ -29,6 +31,7 @@ const QR_TYPES = [
   { value: 'SMS', label: 'SMS Message', icon: Smartphone },
   { value: 'TEXT', label: 'Plain Text', icon: FileText },
   { value: 'SOCIAL', label: 'Social Profile', icon: Share2 },
+  { value: 'APP_STORE', label: 'App Store Link', icon: Store },
 ] as const
 
 export function TypeSelector({ selectedType, onTypeChange }: TypeSelectorProps) {
