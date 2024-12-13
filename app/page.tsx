@@ -7,7 +7,6 @@ import { DynamicForm } from './components/DynamicForm'
 import { QRCodeDisplay } from './components/QRCodeDisplay'
 import { Customization } from './components/Customization'
 import { ThemeToggle } from './components/ThemeToggle'
-import { ThemeProvider } from "@/components/theme-provider"
 import { Footer } from '@/components/Footer'
 import { Logo } from '@/components/Logo'
 
@@ -16,7 +15,7 @@ export default function QRCodeGenerator() {
   const [qrData, setQRData] = useState('')
   const [color, setColor] = useState('#000000')
   const [bgColor, setBgColor] = useState('#FFFFFF')
-  const [frame, setFrame] = useState('none')
+  const [frame, setFrame] = useState('rounded')
   const [frameLabel, setFrameLabel] = useState('Scan Me')
   const [frameLabelPosition, setFrameLabelPosition] = useState<'top' | 'bottom'>('bottom')
   const [logo, setLogo] = useState('')
