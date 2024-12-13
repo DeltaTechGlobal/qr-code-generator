@@ -22,16 +22,16 @@ interface TypeSelectorProps {
 }
 
 const QR_TYPES = [
-  { value: 'URL', label: 'Website URL', icon: Globe },
-  { value: 'EMAIL', label: 'Email Address', icon: Mail },
+  { value: 'VCARD', label: 'vCard Contact', icon: CreditCard },
   { value: 'WIFI', label: 'WiFi Network', icon: Wifi },
-  { value: 'PHONE', label: 'Phone Number', icon: Phone },
-  { value: 'VCARD', label: 'Contact Card', icon: CreditCard },
-  { value: 'GEO', label: 'Location', icon: MapPin },
-  { value: 'SMS', label: 'SMS Message', icon: Smartphone },
-  { value: 'TEXT', label: 'Plain Text', icon: FileText },
   { value: 'SOCIAL', label: 'Social Profile', icon: Share2 },
   { value: 'APP_STORE', label: 'App Store Link', icon: Store },
+  { value: 'URL', label: 'Website URL', icon: Globe },
+  { value: 'SMS', label: 'SMS Message', icon: Smartphone },
+  { value: 'PHONE', label: 'Phone Number', icon: Phone },
+  { value: 'EMAIL', label: 'Email Address', icon: Mail },
+  { value: 'GEO', label: 'Location', icon: MapPin },
+  { value: 'TEXT', label: 'Plain Text', icon: FileText },
 ] as const
 
 export function TypeSelector({ selectedType, onTypeChange }: TypeSelectorProps) {

@@ -45,6 +45,17 @@ export default function QRCodeGenerator() {
               <div>
                 <TypeSelector selectedType={selectedType} onTypeChange={setSelectedType} />
                 <DynamicForm type={selectedType} onGenerate={handleGenerate} />
+              </div>
+              <div className="space-y-6">
+                <QRCodeDisplay 
+                  value={qrData} 
+                  color={color} 
+                  bgColor={bgColor} 
+                  frame={frame} 
+                  frameLabel={frameLabel}
+                  frameLabelPosition={frameLabelPosition}
+                  logo={logo}
+                />
                 <Customization
                   color={color}
                   bgColor={bgColor}
@@ -59,15 +70,6 @@ export default function QRCodeGenerator() {
                   onLogoChange={setLogo}
                 />
               </div>
-              <QRCodeDisplay 
-                value={qrData} 
-                color={color} 
-                bgColor={bgColor} 
-                frame={frame} 
-                frameLabel={frameLabel}
-                frameLabelPosition={frameLabelPosition}
-                logo={logo}
-              />
             </div>
           </CardContent>
         </Card>
