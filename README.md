@@ -1,79 +1,124 @@
 # QR Code Generator
 
-A modern, feature-rich QR Code Generator built with Next.js 14, TypeScript, and Tailwind CSS. Generate QR codes for various purposes including URLs, WiFi credentials, email, social media profiles, visiting cards, cryptocurrency transactions, and plain text.
+A modern, feature-rich QR code generator built with Next.js and TypeScript. Create customized QR codes for various purposes with an intuitive user interface.
+
+![QR Code Generator Screenshot](public/screenshot.png)
 
 ## Features
 
-- Multiple QR Code types support
-- Customizable QR Code appearance
-  - Custom colors (foreground and background)
-  - Frame styles (none, square, rounded)
-  - Frame labels with position control
-  - Logo upload capability
-- Dark/Light theme support
-- Responsive design
-- PNG download functionality
-- Modern UI with Tailwind CSS
+### Multiple QR Code Types
+- **vCard Contact**: Create QR codes for contact information
+- **WiFi Network**: Share WiFi credentials securely
+- **Social Profile**: Link to social media profiles
+- **App Store Links**: Direct links to apps across different stores
+- **Website URL**: Quick access to websites
+- **SMS Message**: Generate SMS QR codes
+- **Phone Number**: Quick dial QR codes
+- **Email Address**: Direct email QR codes
+- **Location**: Share geographical coordinates
+- **Plain Text**: Encode any text message
 
-## Prerequisites
+### Customization Options
+- Custom colors for QR code and background
+- Multiple frame styles
+- Customizable frame labels
+- Logo insertion capability
+- Adjustable frame label position
 
-- Node.js 18.17 or later
+## Tech Stack
+
+- **Framework**: Next.js 14
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS
+- **UI Components**: 
+  - Radix UI
+  - Shadcn UI
+  - Lucide Icons
+- **QR Code**: qrcode.react
+- **Theme**: Dark/Light mode support
+
+## Getting Started
+
+### Prerequisites
+- Node.js 18+ 
 - Yarn package manager
 
-### Installing Prerequisites on macOS
+### Installation
 
-1. Install Homebrew (if not already installed):
+1. Clone the repository:
 ```bash
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+git clone https://github.com/yourusername/qr-code-generator.git
+cd qr-code-generator
 ```
 
-2. Install Node.js:
+2. Install dependencies:
 ```bash
-brew install node
+yarn install
 ```
 
-3. Install Yarn:
+3. Start the development server:
 ```bash
-brew install yarn
+yarn dev
 ```
 
-4. Verify installations:
-```bash
-node --version  # Should be 18.17 or later
-yarn --version
-```
+4. Open [http://localhost:3000](http://localhost:3000) in your browser
 
-## Installation
-
-1. Clone the repository: 
-```
-
-## Build for Production
-
-To create a production build:
+### Building for Production
 
 ```bash
 yarn build
 ```
 
-To start the production server:
+## Usage
 
-```bash
-yarn start
-```
+1. Select a QR code type from the dropdown menu
+2. Fill in the required information
+3. Customize the appearance using the options panel
+4. Download your QR code as PNG
 
-## Deployment to GitHub Pages
+## Features in Detail
 
-1. Fork this repository
-2. Update `next.config.js` with your repository name:
-    ```js
-    basePath: '/your-repo-name',
-    assetPrefix: '/your-repo-name/',
-    ```
-3. Push to your GitHub repository
-4. Enable GitHub Pages in your repository settings:
-    - Go to Settings > Pages
-    - Set Source to "GitHub Actions"
-5. The site will be automatically deployed when you push to the main branch
+### vCard Contact QR Code
+- Full contact information support
+- Professional formatting
+- Compatible with most QR code scanners
 
-## Technology Stack
+### WiFi Network QR Code
+- Supports WPA/WPA2, WEP, and open networks
+- Hidden network option
+- Secure password handling
+
+### App Store Links
+- Support for multiple app stores:
+  - Apple App Store
+  - Google Play Store
+  - Amazon Appstore
+  - Chrome Web Store
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Acknowledgments
+
+- [Next.js](https://nextjs.org/)
+- [Tailwind CSS](https://tailwindcss.com/)
+- [Radix UI](https://www.radix-ui.com/)
+- [Shadcn UI](https://ui.shadcn.com/)
+- [QRCode.react](https://github.com/zpao/qrcode.react)
+
+## Contact
+
+Your Name - [@yourtwitter](https://twitter.com/yourtwitter)
+
+Project Link: [https://github.com/yourusername/qr-code-generator](https://github.com/yourusername/qr-code-generator)
