@@ -11,18 +11,26 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
+    
     - name: Setup Node.js
-      uses: actions/setup-node@v2
+      uses: actions/setup-node@v3
       with:
         node-version: '18'
+        cache: 'yarn'
+        
     - name: Install Dependencies
-      run: yarn install
-    - name: Build Web Version
-      run: yarn build
+      run: yarn install --frozen-lockfile
+      
+    - name: Build
+      run: |
+        yarn build
+        touch out/.nojekyll
+        cp public/CNAME out/CNAME
+        
     - name: Deploy to GitHub Pages
       if: github.ref == 'refs/heads/main'
-      uses: JamesIves/github-pages-deploy-action@4.1.4
+      uses: JamesIves/github-pages-deploy-action@v4
       with:
         branch: gh-pages
         folder: out

@@ -4,13 +4,7 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-  ...(process.env.NODE_ENV === 'production' ? {
-    basePath: '/qr-code-generator',
-    assetPrefix: '/qr-code-generator/',
-  } : {
-    basePath: '',
-    assetPrefix: '',
-  }),
+  trailingSlash: true,
   webpack: (config, { isServer }) => {
     // Suppress the warning
     config.ignoreWarnings = [
