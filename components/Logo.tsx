@@ -3,8 +3,10 @@
 import Image from 'next/image'
 
 export function Logo() {
-  const basePath = process.env.NODE_ENV === 'production' ? '/qr-code-generator' : ''
-  
+  const basePath = process.env.NODE_ENV === 'production' 
+    ? '//generateqrcode.online'
+    : ''
+
   return (
     <div className="relative w-20 h-20">
       <Image

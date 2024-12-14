@@ -3,6 +3,17 @@ const nextConfig = {
   output: 'export',
   images: {
     unoptimized: true,
+    domains: ['generateqrcode.online'],
+    remotePatterns: [
+      {
+        protocol: 'http',
+        hostname: 'generateqrcode.online'
+      },
+      {
+        protocol: 'https',
+        hostname: 'generateqrcode.online'
+      }
+    ]
   },
   trailingSlash: true,
   webpack: (config, { isServer }) => {
