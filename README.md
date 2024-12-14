@@ -69,6 +69,12 @@ yarn dev
 yarn build
 ```
 
+- ### Deployment
++ ### Deployment to GitHub Pages
+```bash
+yarn deploy
+```
+
 ## Usage
 
 1. Select a QR code type from the dropdown menu
