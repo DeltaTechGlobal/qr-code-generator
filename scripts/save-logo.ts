@@ -6,6 +6,6 @@ const imageData = `data:image/png;base64,<base64_data_here>`
 const base64Data = imageData.replace(/^data:image\/png;base64,/, '')
 
 fs.writeFileSync(
-  path.join(process.cwd(), 'public', 'qr-logo.png'),
+  path.join(process.cwd(), 'public', 'logo.png'),
   Buffer.from(base64Data, 'base64')
 ) 
