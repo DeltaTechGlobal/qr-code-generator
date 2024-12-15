@@ -3,7 +3,9 @@
 import React, { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Loader2 } from 'lucide-react'
-import { useToast } from "@/components/ui/use-toast"
+import { useToast } from "@/hooks/use-toast"
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 
 interface DynamicFormProps {
   type: string
@@ -15,6 +17,67 @@ export function DynamicForm({ type, onGenerate }: DynamicFormProps) {
   const [isGenerating, setIsGenerating] = useState(false)
   const { toast } = useToast()
 
+  const renderFields = () => {
+    switch (type) {
+      case 'URL':
+        return (
+          <div className="space-y-2">
+            <Label htmlFor="url">Website</Label>
+            <Input
+              type="url"
+              id="url"
+              placeholder="Enter your website"
+              value={formData.url || ''}
+              onChange={(e) => setFormData({ ...formData, url: e.target.value })}
+            />
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Example: https://www.example.com
+            </p>
+          </div>
+        )
+      case 'WiFi':
+        return (
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="ssid">Network Name (SSID)</Label>
+              <Input
+                type="text"
+                id="ssid"
+                placeholder="Enter network name"
+                value={formData.ssid || ''}
+                onChange={(e) => setFormData({ ...formData, ssid: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <Input
+                type="password"
+                id="password"
+                placeholder="Enter network password"
+                value={formData.password || ''}
+                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+              />
+            </div>
+          </div>
+        )
+      case 'Text':
+        return (
+          <div className="space-y-2">
+            <Label htmlFor="text">Text</Label>
+            <Input
+              type="text"
+              id="text"
+              placeholder="Enter your text"
+              value={formData.text || ''}
+              onChange={(e) => setFormData({ ...formData, text: e.target.value })}
+            />
+          </div>
+        )
+      default:
+        return null
+    }
+  }
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setIsGenerating(true)
@@ -23,19 +86,27 @@ export function DynamicForm({ type, onGenerate }: DynamicFormProps) {
       let qrData = ''
 
       switch (type) {
-        // ... your existing switch cases
+        case 'URL':
+          qrData = formData.url || ''
+          break
+        case 'WiFi':
+          qrData = `WIFI:S:${formData.ssid};T:WPA;P:${formData.password};;`
+          break
+        case 'Text':
+          qrData = formData.text || ''
+          break
+        default:
+          qrData = ''
       }
 
       onGenerate(qrData)
 
-      // Show success toast
       toast({
         title: "QR Code Generated!",
         description: "Scroll down to see your QR code",
         className: "bg-green-50 dark:bg-green-900 border-green-200",
       })
 
-      // Smooth scroll to QR code on mobile
       if (window.innerWidth < 768) {
         const qrElement = document.getElementById('qr-container')
         if (qrElement) {
@@ -46,7 +117,7 @@ export function DynamicForm({ type, onGenerate }: DynamicFormProps) {
       toast({
         title: "Generation Failed",
         description: "Please try again",
-        variant: "destructive",
+        className: "bg-red-50 dark:bg-red-900 border-red-200",
       })
     } finally {
       setIsGenerating(false)
@@ -55,8 +126,7 @@ export function DynamicForm({ type, onGenerate }: DynamicFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      {/* ... rest of your form */}
-      
+      {renderFields()}
       <Button 
         type="submit" 
         className="w-full relative"
