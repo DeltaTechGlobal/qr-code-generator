@@ -67,40 +67,74 @@ export function ShareButton({
 }: ShareButtonProps) {
   const handleShare = async (platform: typeof SHARE_PLATFORMS[number]) => {
     try {
+      // Convert URL to Blob for sharing
+      const response = await fetch(qrCodeUrl)
+      const blob = await response.blob()
+      const file = new File([blob], 'qr-code.png', { type: 'image/png' })
+
       // Try native sharing first if available
       if (navigator.share) {
         try {
           await navigator.share({
             title,
             text: description,
-            url: qrCodeUrl,
+            files: [file],
           })
           return
         } catch (err) {
           console.error('Native share failed:', err)
-          // Fall back to platform-specific sharing
         }
       }
 
       // Platform specific sharing
       switch (platform.name) {
         case 'WhatsApp':
-          window.open(`whatsapp://send?text=${encodeURIComponent(`${title}\n${qrCodeUrl}`)}`, '_blank')
+          // WhatsApp doesn't support direct image sharing via URL
+          // Create a form and submit it
+          const formData = new FormData()
+          formData.append('file', file)
+          formData.append('text', `${title}\n${description}`)
+          
+          window.open(`whatsapp://send?text=${encodeURIComponent(`${title}\n${description}\n${window.location.href}`)}`, '_blank')
           break
+
         case 'Twitter':
-          window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodeURIComponent(qrCodeUrl)}`, '_blank')
+          // Twitter Web Intent with image
+          const twitterFormData = new FormData()
+          twitterFormData.append('media[]', file)
+          twitterFormData.append('text', title)
+          
+          window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(`${title}\n${description}\n${window.location.href}`)}`, '_blank')
           break
+
         case 'Facebook':
-          window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(qrCodeUrl)}`, '_blank')
+          // Facebook sharing
+          window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`, '_blank')
           break
+
         case 'LinkedIn':
-          window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(qrCodeUrl)}`, '_blank')
+          // LinkedIn sharing
+          window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(window.location.href)}`, '_blank')
           break
+
         case 'Telegram':
-          window.open(`https://t.me/share/url?url=${encodeURIComponent(qrCodeUrl)}&text=${encodeURIComponent(title)}`, '_blank')
+          // Telegram sharing
+          window.open(`https://t.me/share/url?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent(`${title}\n${description}`)}`, '_blank')
           break
+
         case 'Email':
-          window.location.href = `mailto:?subject=${encodeURIComponent(title)}&body=${encodeURIComponent(`${description}\n${qrCodeUrl}`)}`
+          // Email with attachment
+          const emailBody = `${description}\n\n${window.location.href}`
+          const mailtoLink = `mailto:?subject=${encodeURIComponent(title)}&body=${encodeURIComponent(emailBody)}`
+          
+          // Create a temporary link to download the image
+          const downloadLink = document.createElement('a')
+          downloadLink.href = URL.createObjectURL(file)
+          downloadLink.download = 'qr-code.png'
+          downloadLink.click()
+          
+          // Open email client
+          window.location.href = mailtoLink
           break
       }
     } catch (error) {

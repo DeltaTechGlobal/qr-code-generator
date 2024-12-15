@@ -17,12 +17,22 @@ const nextConfig = {
   },
   trailingSlash: true,
   webpack: (config, { isServer }) => {
-    // Suppress the warning
+    // Handle punycode deprecation warning
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        punycode: false,
+      };
+    }
+
+    // Suppress specific module warnings
     config.ignoreWarnings = [
       { module: /node_modules\/node-fetch\/lib\/index\.js/ },
-      { module: /node_modules\/punycode\/punycode\.js/ },
-    ]
-    return config
+      { message: /Critical dependency: the request of a dependency is an expression/ },
+      /The 'punycode' module is deprecated/,
+    ];
+
+    return config;
   },
 }
 
