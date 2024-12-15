@@ -10,12 +10,12 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { 
   FaWhatsapp, 
-  FaTwitter, 
+  FaXTwitter, 
   FaLinkedin, 
   FaFacebook, 
   FaTelegram,
   FaEnvelope
-} from 'react-icons/fa'
+} from 'react-icons/fa6'
 
 interface ShareButtonProps {
   disabled: boolean
@@ -32,9 +32,9 @@ const SHARE_PLATFORMS = [
     color: '#25D366',
   },
   {
-    name: 'Twitter',
-    icon: FaTwitter,
-    color: '#1DA1F2',
+    name: 'X',
+    icon: FaXTwitter,
+    color: '#000000',
   },
   {
     name: 'Facebook',
@@ -98,13 +98,13 @@ export function ShareButton({
           window.open(`whatsapp://send?text=${encodeURIComponent(`${title}\n${description}\n${window.location.href}`)}`, '_blank')
           break
 
-        case 'Twitter':
-          // Twitter Web Intent with image
-          const twitterFormData = new FormData()
-          twitterFormData.append('media[]', file)
-          twitterFormData.append('text', title)
+        case 'X':
+          // X Web Intent with image
+          const xFormData = new FormData()
+          xFormData.append('media[]', file)
+          xFormData.append('text', title)
           
-          window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(`${title}\n${description}\n${window.location.href}`)}`, '_blank')
+          window.open(`https://x.com/intent/tweet?text=${encodeURIComponent(`${title}\n${description}\n${window.location.href}`)}`, '_blank')
           break
 
         case 'Facebook':
