@@ -74,7 +74,14 @@ export function QRCodeDisplay({
 
   return (
     <div className="flex flex-col items-center">
-      <div className={`relative ${frameLabelPosition === 'top' ? 'mt-12' : ''}`}>
+      <div 
+        className={`
+          relative 
+          ${frameLabelPosition === 'top' ? 'mt-12' : ''} 
+          transition-all duration-300 ease-in-out
+          ${value ? 'opacity-100 scale-100' : 'opacity-50 scale-95'}
+        `}
+      >
         <div 
           ref={qrContainerRef}
           id="qr-container"
@@ -123,7 +130,12 @@ export function QRCodeDisplay({
         </div>
       </div>
 
-      <div className={`w-full max-w-md flex gap-2 justify-center ${frameLabelPosition === 'bottom' ? 'mt-16' : 'mt-4'}`}>
+      <div className={`
+        w-full max-w-md flex gap-2 justify-center 
+        ${frameLabelPosition === 'bottom' ? 'mt-16' : 'mt-4'}
+        transition-opacity duration-300
+        ${value ? 'opacity-100' : 'opacity-50'}
+      `}>
         <Button 
           onClick={handleDownload}
           disabled={!value}

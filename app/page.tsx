@@ -41,10 +41,17 @@ export default function QRCodeGenerator() {
                 Generate custom QR codes for any purpose
               </p>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative">
               <div>
                 <TypeSelector selectedType={selectedType} onTypeChange={setSelectedType} />
-                <DynamicForm type={selectedType} onGenerate={handleGenerate} />
+                <DynamicForm type={selectedType} onGenerate={setQRData} />
+              </div>
+              <div className="md:hidden flex items-center justify-center py-4">
+                {qrData && (
+                  <div className="flex items-center text-sm text-gray-600 dark:text-gray-400 animate-bounce">
+                    <span>↓ Your QR Code is Ready Below ↓</span>
+                  </div>
+                )}
               </div>
               <div className="space-y-6">
                 <QRCodeDisplay 
