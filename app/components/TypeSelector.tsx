@@ -10,9 +10,8 @@ import {
   MapPin, 
   FileText, 
   Share2, 
-  Smartphone,
+  MessageSquare,
   Globe,
-  AppWindow,
   Store,
   Calendar
 } from 'lucide-react'
@@ -23,15 +22,15 @@ interface TypeSelectorProps {
 }
 
 const QR_TYPES = [
-  { value: 'event', label: 'Calendar Event', icon: Calendar },
+  { value: 'Event', label: 'Calendar Event', icon: Calendar },
   { value: 'VCARD', label: 'vCard Contact', icon: CreditCard },
   { value: 'WIFI', label: 'WiFi Network', icon: Wifi },
   { value: 'SOCIAL', label: 'Social Profile', icon: Share2 },
   { value: 'APP_STORE', label: 'App Store Link', icon: Store },
   { value: 'URL', label: 'Website URL', icon: Globe },
-  { value: 'SMS', label: 'SMS Message', icon: Smartphone },
+  { value: 'SMS', label: 'SMS Message', icon: MessageSquare },
   { value: 'PHONE', label: 'Phone Number', icon: Phone },
-  { value: 'EMAIL', label: 'Email Address', icon: Mail },
+  { value: 'EMAIL', label: 'Compose Email', icon: Mail },
   { value: 'GEO', label: 'Location', icon: MapPin },
   { value: 'TEXT', label: 'Plain Text', icon: FileText },
 ] as const

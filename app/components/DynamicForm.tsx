@@ -6,9 +6,10 @@ import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Apple, ShoppingBag, Chrome, Store } from 'lucide-react'
+import { Apple, ShoppingBag, Chrome, Store, Loader2 } from 'lucide-react'
 import { Checkbox } from "@/components/ui/checkbox"
 import { CheckedState } from "@radix-ui/react-checkbox"
+import { useToast } from "@/hooks/use-toast"
 
 interface DynamicFormProps {
   type: string
@@ -54,6 +55,16 @@ interface FormDataType {
   street?: string
   city?: string
   country?: string
+  // Event fields
+  title?: string
+  location?: string
+  startTime?: string
+  endTime?: string
+  reminder?: string
+  notes?: string
+  // Enhanced email fields
+  subject?: string
+  body?: string
 }
 
 export function DynamicForm({ type, onGenerate }: DynamicFormProps) {
@@ -61,6 +72,8 @@ export function DynamicForm({ type, onGenerate }: DynamicFormProps) {
     wifiHidden: false,
     wifiEncryption: 'WPA'
   })
+  const [isGenerating, setIsGenerating] = useState(false)
+  const { toast } = useToast()
 
   useEffect(() => {
     setFormData({
@@ -69,33 +82,36 @@ export function DynamicForm({ type, onGenerate }: DynamicFormProps) {
     })
   }, [type])
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    let qrData = ''
+    setIsGenerating(true)
 
-    switch (type) {
-      case 'APP_STORE':
-        switch (formData.store) {
-          case 'apple':
-            qrData = `https://apps.apple.com/app/${formData.appId}`
-            break
-          case 'google':
-            qrData = `https://play.google.com/store/apps/details?id=${formData.appId}`
-            break
-          case 'amazon':
-            qrData = `https://www.amazon.com/dp/${formData.appId}`
-            break
-          case 'chrome':
-            qrData = `https://chrome.google.com/webstore/detail/${formData.appId}`
-            break
-        }
-        break
-      case 'SMS':
-        qrData = `SMSTO:${formData.phone}:${formData.message}`
-        break
-      case 'VCARD':
-        // Format data as vCard 3.0
-        qrData = `BEGIN:VCARD
+    try {
+      let qrData = ''
+
+      switch (type) {
+        case 'APP_STORE':
+          switch (formData.store) {
+            case 'apple':
+              qrData = `https://apps.apple.com/app/${formData.appId}`
+              break
+            case 'google':
+              qrData = `https://play.google.com/store/apps/details?id=${formData.appId}`
+              break
+            case 'amazon':
+              qrData = `https://www.amazon.com/dp/${formData.appId}`
+              break
+            case 'chrome':
+              qrData = `https://chrome.google.com/webstore/detail/${formData.appId}`
+              break
+          }
+          break
+        case 'SMS':
+          qrData = `SMSTO:${formData.phone}:${formData.message}`
+          break
+        case 'VCARD':
+          // Format data as vCard 3.0
+          qrData = `BEGIN:VCARD
 VERSION:3.0
 N:${formData.lastName};${formData.firstName};;;
 FN:${formData.firstName} ${formData.lastName}
@@ -108,31 +124,84 @@ EMAIL:${formData.email}
 URL:${formData.website}
 ADR:;;${formData.street};${formData.city};;;${formData.country}
 END:VCARD`
-        break
-      case 'WIFI':
-        const encryption = formData.wifiEncryption as string
-        qrData = `WIFI:T:${encryption};S:${formData.ssid};P:${formData.password || ''};H:${formData.wifiHidden ? 'true' : 'false'};`
-        break
-      case 'SOCIAL':
-        qrData = formData.social as string
-        break
-      case 'URL':
-        qrData = formData.url as string
-        break
-      case 'PHONE':
-        qrData = `tel:${formData.phone}`
-        break
-      case 'EMAIL':
-        qrData = `mailto:${formData.email}`
-        break
-      case 'GEO':
-        qrData = `geo:${formData.latitude},${formData.longitude}`
-        break
-      default:
-        qrData = formData.text || ''
-    }
+          break
+        case 'WIFI':
+          const encryption = formData.wifiEncryption as string
+          qrData = `WIFI:T:${encryption};S:${formData.ssid};P:${formData.password || ''};H:${formData.wifiHidden ? 'true' : 'false'};`
+          break
+        case 'SOCIAL':
+          qrData = formData.social as string
+          break
+        case 'URL':
+          qrData = formData.url as string
+          break
+        case 'PHONE':
+          qrData = `tel:${formData.phone}`
+          break
+        case 'EMAIL':
+          qrData = `mailto:${formData.email}?subject=${encodeURIComponent(formData.subject || '')}&body=${encodeURIComponent(formData.body || '')}`
+          break
+        case 'GEO':
+          qrData = `geo:${formData.latitude},${formData.longitude}`
+          break
+        case 'Event':
+          const startDate = new Date(formData.startTime || '')
+          const endDate = new Date(formData.endTime || '')
+          const reminderMinutes = parseInt(formData.reminder || '15')
+          
+          // Format dates for iCalendar
+          const formatDate = (date: Date) => {
+            return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z'
+          }
+          
+          const eventData = [
+            'BEGIN:VCALENDAR',
+            'VERSION:2.0',
+            'BEGIN:VEVENT',
+            `SUMMARY:${formData.title || ''}`,
+            `DTSTART:${formatDate(startDate)}`,
+            `DTEND:${formatDate(endDate)}`,
+            formData.location ? `LOCATION:${formData.location}` : '',
+            formData.url ? `URL:${formData.url}` : '',
+            formData.notes ? `DESCRIPTION:${formData.notes}` : '',
+            `BEGIN:VALARM`,
+            `TRIGGER:-PT${reminderMinutes}M`,
+            `ACTION:DISPLAY`,
+            `DESCRIPTION:Reminder`,
+            `END:VALARM`,
+            'END:VEVENT',
+            'END:VCALENDAR'
+          ].filter(Boolean).join('\n')
+          
+          qrData = eventData
+          break
+        default:
+          qrData = formData.text || ''
+      }
 
-    onGenerate(qrData)
+      onGenerate(qrData)
+
+      toast({
+        title: "QR Code Generated!",
+        description: "Scroll down to see your QR code",
+        className: "bg-green-50 dark:bg-green-900 border-green-200",
+      })
+
+      if (window.innerWidth < 768) {
+        const qrElement = document.getElementById('qr-container')
+        if (qrElement) {
+          qrElement.scrollIntoView({ behavior: 'smooth' })
+        }
+      }
+    } catch (error) {
+      toast({
+        title: "Generation Failed",
+        description: "Please try again",
+        className: "bg-red-50 dark:bg-red-900 border-red-200",
+      })
+    } finally {
+      setIsGenerating(false)
+    }
   }
 
   const renderFields = () => {
@@ -495,9 +564,26 @@ END:VCARD`
                 onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
                 className="w-full"
               />
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                Example: john.doe@example.com
-              </p>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="subject">Subject (Optional)</Label>
+              <Input
+                id="subject"
+                placeholder="Enter email subject"
+                value={formData.subject || ''}
+                onChange={(e) => setFormData(prev => ({ ...prev, subject: e.target.value }))}
+                className="w-full"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="body">Message (Optional)</Label>
+              <Textarea
+                id="body"
+                placeholder="Enter email body"
+                value={formData.body || ''}
+                onChange={(e) => setFormData(prev => ({ ...prev, body: e.target.value }))}
+                className="w-full"
+              />
             </div>
           </div>
         )
@@ -536,6 +622,79 @@ END:VCARD`
             </div>
           </div>
         )
+      case 'Event':
+        return (
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="title">Event Title *</Label>
+              <Input
+                type="text"
+                id="title"
+                required
+                placeholder="Enter event title"
+                value={formData.title || ''}
+                onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="location">Location</Label>
+              <Input
+                type="text"
+                id="location"
+                placeholder="Enter event location"
+                value={formData.location || ''}
+                onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="startTime">Start Time *</Label>
+              <Input
+                type="datetime-local"
+                id="startTime"
+                required
+                value={formData.startTime || ''}
+                onChange={(e) => setFormData(prev => ({ ...prev, startTime: e.target.value }))}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="endTime">End Time *</Label>
+              <Input
+                type="datetime-local"
+                id="endTime"
+                required
+                value={formData.endTime || ''}
+                onChange={(e) => setFormData(prev => ({ ...prev, endTime: e.target.value }))}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="reminder">Reminder Before Event</Label>
+              <Select 
+                value={formData.reminder || '15'} 
+                onValueChange={(value) => setFormData(prev => ({ ...prev, reminder: value }))}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select reminder time" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="5">5 minutes</SelectItem>
+                  <SelectItem value="15">15 minutes</SelectItem>
+                  <SelectItem value="30">30 minutes</SelectItem>
+                  <SelectItem value="60">1 hour</SelectItem>
+                  <SelectItem value="120">2 hours</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="notes">Notes</Label>
+              <Textarea
+                id="notes"
+                placeholder="Add any additional notes"
+                value={formData.notes || ''}
+                onChange={(e) => setFormData(prev => ({ ...prev, notes: e.target.value }))}
+              />
+            </div>
+          </div>
+        )
       default:
         return (
           <div className="space-y-2">
@@ -555,8 +714,19 @@ END:VCARD`
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {renderFields()}
-      <Button type="submit" className="w-full">
-        Generate QR Code
+      <Button 
+        type="submit" 
+        className="w-full relative"
+        disabled={isGenerating}
+      >
+        {isGenerating ? (
+          <>
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            Generating...
+          </>
+        ) : (
+          'Generate QR Code'
+        )}
       </Button>
     </form>
   )
