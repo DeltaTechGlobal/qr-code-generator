@@ -4,8 +4,10 @@ import { useState, useRef } from 'react'
 import QRCode from 'qrcode.react'
 import { Button } from '@/components/ui/button'
 import html2canvas from 'html2canvas'
-import { Download, Share2 } from 'lucide-react'
+import { Download, Share2, ChevronDown } from 'lucide-react'
 import { ShareButton } from './ShareButton'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { jsPDF } from 'jspdf'
 
 interface QRCodeDisplayProps {
   value: string
@@ -27,24 +29,39 @@ export function QRCodeDisplay({
   logo
 }: QRCodeDisplayProps) {
   const [qrImageBlob, setQrImageBlob] = useState<Blob | null>(null)
-  const qrContainerRef = useRef<HTMLDivElement>(null)
+  const [downloadFormat, setDownloadFormat] = useState<'png' | 'pdf'>('png')
+  const [downloadSize, setDownloadSize] = useState<string>('300')
+  const qrRef = useRef<HTMLDivElement>(null)
 
-  const generateQRImage = async () => {
-    if (!qrContainerRef.current) return null
+  const generateQRImage = async (format: 'png' | 'pdf', size: number) => {
+    if (!qrRef.current || !value) return null
 
     try {
-      // Add padding to capture the frame label
       const padding = 40
-      const canvas = await html2canvas(qrContainerRef.current, {
+      const scale = size / 256
+
+      const canvas = await html2canvas(qrRef.current, {
         backgroundColor: '#FFFFFF',
-        scale: 2,
+        scale: scale * 2,
         logging: false,
         useCORS: true,
         allowTaint: true,
-        width: qrContainerRef.current.offsetWidth,
-        height: qrContainerRef.current.offsetHeight + (padding * 2), // Add padding for label
-        y: frameLabelPosition === 'top' ? -padding : 0, // Adjust position based on label
+        width: qrRef.current.offsetWidth,
+        height: qrRef.current.offsetHeight + (padding * 2),
+        y: frameLabelPosition === 'top' ? -padding : 0,
       })
+
+      if (format === 'pdf') {
+        const imgData = canvas.toDataURL('image/png')
+        const pdf = new jsPDF({
+          orientation: 'portrait',
+          unit: 'px',
+          format: [size + 80, size + 80]
+        })
+        pdf.addImage(imgData, 'PNG', 40, 40, size, size)
+        const pdfBlob = pdf.output('blob')
+        return pdfBlob
+      }
 
       return new Promise<Blob>((resolve) => {
         canvas.toBlob((blob) => {
@@ -54,19 +71,20 @@ export function QRCodeDisplay({
         }, 'image/png')
       })
     } catch (error) {
-      console.error('Error generating QR code image:', error)
+      console.error('Error generating QR code:', error)
       return null
     }
   }
 
   const handleDownload = async () => {
-    const blob = await generateQRImage()
+    const size = parseInt(downloadSize)
+    const blob = await generateQRImage(downloadFormat, size)
     if (!blob) return
 
     setQrImageBlob(blob)
     const url = URL.createObjectURL(blob)
     const link = document.createElement('a')
-    link.download = 'qr-code.png'
+    link.download = `qr-code.${downloadFormat}`
     link.href = url
     link.click()
     URL.revokeObjectURL(url)
@@ -83,7 +101,7 @@ export function QRCodeDisplay({
         `}
       >
         <div 
-          ref={qrContainerRef}
+          ref={qrRef}
           id="qr-container"
           className="relative bg-white"
           style={{ 
@@ -105,7 +123,7 @@ export function QRCodeDisplay({
           
           <div className="relative w-64 h-64">
             <QRCode
-              value={value || 'https://example.com'}
+              value={value || ''}
               size={256}
               level="H"
               fgColor={color}
@@ -131,28 +149,61 @@ export function QRCodeDisplay({
       </div>
 
       <div className={`
-        w-full max-w-md flex gap-2 justify-center 
-        ${frameLabelPosition === 'bottom' ? 'mt-16' : 'mt-4'}
-        transition-opacity duration-300
-        ${value ? 'opacity-100' : 'opacity-50'}
+        flex flex-col gap-4 w-full max-w-md mx-auto
+        ${frameLabelPosition === 'bottom' ? 'mt-20' : 'mt-12'}
       `}>
-        <Button 
-          onClick={handleDownload}
-          disabled={!value}
-          className="flex-1 flex items-center justify-center"
-        >
-          <Download className="mr-2 h-4 w-4" />
-          Download PNG
-        </Button>
+        {/* Format and Size Controls Row */}
+        <div className="flex justify-center gap-4">
+          <Select
+            value={downloadFormat}
+            onValueChange={(value: 'png' | 'pdf') => setDownloadFormat(value)}
+          >
+            <SelectTrigger className="w-[120px]">
+              <SelectValue placeholder="Format" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="png">PNG</SelectItem>
+              <SelectItem value="pdf">PDF</SelectItem>
+            </SelectContent>
+          </Select>
 
-        <ShareButton
-          disabled={!value}
-          qrCodeUrl={qrImageBlob ? URL.createObjectURL(qrImageBlob) : ''}
-          title="Check out this QR Code"
-          description="Generated with QR Code Generator"
-          className="flex-1"
-        />
+          <Select
+            value={downloadSize}
+            onValueChange={setDownloadSize}
+          >
+            <SelectTrigger className="w-[120px]">
+              <SelectValue placeholder="Size" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="300">300px</SelectItem>
+              <SelectItem value="400">400px</SelectItem>
+              <SelectItem value="500">500px</SelectItem>
+              <SelectItem value="600">600px</SelectItem>
+              <SelectItem value="700">700px</SelectItem>
+              <SelectItem value="800">800px</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Download and Share Buttons Row */}
+        <div className="flex justify-center gap-4">
+          <Button
+            variant="default"
+            className="w-[120px]"
+            onClick={handleDownload}
+          >
+            <Download className="mr-2 h-4 w-4" />
+            Download
+          </Button>
+          <ShareButton 
+            disabled={!value}
+            qrCodeUrl={qrImageBlob ? URL.createObjectURL(qrImageBlob) : ''}
+            title="Share QR Code"
+            description="Share this QR code with others"
+            className="w-[120px]"
+          />
+        </div>
       </div>
     </div>
   )
-} 
+}
