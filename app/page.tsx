@@ -86,13 +86,10 @@ export default function QRCodeGenerator() {
   return (
     <div className="min-h-screen flex flex-col">
       <div className="flex-grow bg-gradient-to-br from-blue-100 to-purple-100 dark:from-gray-800 dark:to-gray-900 flex flex-col items-center justify-center p-4">
-        <div className="w-full max-w-4xl flex items-center justify-between mb-4">
-          <Logo />
-          <ThemeToggle />
-        </div>
-        <Card className="w-full max-w-4xl bg-white dark:bg-gray-800 shadow-xl rounded-xl overflow-hidden">
-          <CardContent className="p-6">
-            <div className="text-center mb-8">
+        <div className="w-full max-w-4xl">
+          <div className="flex items-center justify-between mb-4">
+            <Logo />
+            <div className="flex-1 text-center mx-8">
               <h1 className="text-4xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400">
                 QR Code Generator
               </h1>
@@ -100,6 +97,11 @@ export default function QRCodeGenerator() {
                 Generate custom QR codes for any purpose
               </p>
             </div>
+            <ThemeToggle />
+          </div>
+        </div>
+        <Card className="w-full max-w-4xl bg-white dark:bg-gray-800 shadow-xl rounded-xl overflow-hidden">
+          <CardContent className="p-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative">
               <div>
                 <TypeSelector selectedType={selectedType} onTypeChange={setSelectedType} />
