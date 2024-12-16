@@ -17,6 +17,7 @@ A modern, feature-rich QR code generator built with Next.js and TypeScript. Crea
 - **Email Address**: Direct email QR codes
 - **Location**: Share geographical coordinates
 - **Plain Text**: Encode any text message
+- **Payment**: Generate payment QR codes for PayPal, Bitcoin, and Ethereum
 
 ### Customization Options
 - Custom colors for QR code and background

@@ -29,6 +29,52 @@ const WIFI_ENCRYPTION_TYPES = [
   { value: 'WEP', label: 'WEP' },
 ] as const
 
+const PAYMENT_TYPES = [
+  { value: 'paypal', label: 'PayPal' },
+  { value: 'bitcoin', label: 'Bitcoin' },
+  { value: 'ethereum', label: 'Ethereum' },
+  { value: 'stripe', label: 'Stripe' },
+  { value: 'cashapp', label: 'Cash App' },
+  { value: 'venmo', label: 'Venmo' },
+  { value: 'googlepay', label: 'Google Pay' },
+  { value: 'applepay', label: 'Apple Pay' },
+  { value: 'wechat', label: 'WeChat Pay' },
+  { value: 'alipay', label: 'Alipay' },
+  { value: 'litecoin', label: 'Litecoin' },
+  { value: 'dogecoin', label: 'Dogecoin' },
+  { value: 'solana', label: 'Solana' },
+  { value: 'usdt', label: 'USDT (Tether)' },
+  { value: 'usdc', label: 'USDC' },
+] as const
+
+const PAYPAL_CURRENCIES = [
+  { value: 'AUD', label: 'Australian Dollar (AUD)' },
+  { value: 'BRL', label: 'Brazilian Real (BRL)' },
+  { value: 'CAD', label: 'Canadian Dollar (CAD)' },
+  { value: 'CNY', label: 'Chinese Yuan (CNY)' },
+  { value: 'CZK', label: 'Czech Koruna (CZK)' },
+  { value: 'DKK', label: 'Danish Krone (DKK)' },
+  { value: 'EUR', label: 'Euro (EUR)' },
+  { value: 'HKD', label: 'Hong Kong Dollar (HKD)' },
+  { value: 'HUF', label: 'Hungarian Forint (HUF)' },
+  { value: 'ILS', label: 'Israeli New Shekel (ILS)' },
+  { value: 'JPY', label: 'Japanese Yen (JPY)' },
+  { value: 'MYR', label: 'Malaysian Ringgit (MYR)' },
+  { value: 'MXN', label: 'Mexican Peso (MXN)' },
+  { value: 'TWD', label: 'New Taiwan Dollar (TWD)' },
+  { value: 'NZD', label: 'New Zealand Dollar (NZD)' },
+  { value: 'NOK', label: 'Norwegian Krone (NOK)' },
+  { value: 'PHP', label: 'Philippine Peso (PHP)' },
+  { value: 'PLN', label: 'Polish Złoty (PLN)' },
+  { value: 'GBP', label: 'British Pound Sterling (GBP)' },
+  { value: 'RUB', label: 'Russian Ruble (RUB)' },
+  { value: 'SGD', label: 'Singapore Dollar (SGD)' },
+  { value: 'SEK', label: 'Swedish Krona (SEK)' },
+  { value: 'CHF', label: 'Swiss Franc (CHF)' },
+  { value: 'THB', label: 'Thai Baht (THB)' },
+  { value: 'USD', label: 'United States Dollar (USD)' }
+] as const
+
 interface FormDataType {
   text?: string
   wifiHidden: boolean
@@ -66,6 +112,10 @@ interface FormDataType {
   subject?: string
   body?: string
   meetingId?: string
+  paymentType?: string
+  paymentAddress?: string
+  amount?: string
+  currency?: string
 }
 
 export function DynamicForm({ type, onGenerate }: DynamicFormProps) {
@@ -179,6 +229,75 @@ END:VCARD`
         case 'zoom':
           qrData = `zoommtg://zoom.us/join?confno=${formData.meetingId}&pwd=${formData.password}`;
           break;
+        case 'PAYMENT':
+          switch (formData.paymentType) {
+            case 'paypal':
+              qrData = `https://www.paypal.com/paypalme/${formData.paymentAddress}${
+                formData.amount ? '/' + formData.amount : ''
+              }`
+              break
+            case 'bitcoin':
+              qrData = `bitcoin:${formData.paymentAddress}${
+                formData.amount ? '?amount=' + formData.amount : ''
+              }`
+              break
+            case 'ethereum':
+              qrData = `ethereum:${formData.paymentAddress}${
+                formData.amount ? '?value=' + formData.amount : ''
+              }`
+              break
+            case 'litecoin':
+              qrData = `litecoin:${formData.paymentAddress}${
+                formData.amount ? '?amount=' + formData.amount : ''
+              }`
+              break
+            case 'dogecoin':
+              qrData = `dogecoin:${formData.paymentAddress}${
+                formData.amount ? '?amount=' + formData.amount : ''
+              }`
+              break
+            case 'solana':
+              qrData = `solana:${formData.paymentAddress}${
+                formData.amount ? '?amount=' + formData.amount : ''
+              }`
+              break
+            case 'usdt':
+              qrData = `tether:${formData.paymentAddress}${
+                formData.amount ? '?amount=' + formData.amount : ''
+              }`
+              break
+            case 'usdc':
+              qrData = `usdc:${formData.paymentAddress}${
+                formData.amount ? '?amount=' + formData.amount : ''
+              }`
+              break
+            case 'cashapp':
+              qrData = `https://cash.app/$${formData.paymentAddress}${
+                formData.amount ? '/' + formData.amount : ''
+              }`
+              break
+            case 'venmo':
+              qrData = `https://venmo.com/${formData.paymentAddress}${
+                formData.amount ? '?amount=' + formData.amount : ''
+              }`
+              break
+            case 'googlepay':
+              qrData = `https://pay.google.com/payments/u/0/send?phone=${formData.paymentAddress}${
+                formData.amount ? '&amount=' + formData.amount : ''
+              }`
+              break
+            case 'wechat':
+              qrData = `wxp://${formData.paymentAddress}${
+                formData.amount ? '?amount=' + formData.amount : ''
+              }`
+              break
+            case 'alipay':
+              qrData = `alipay://platformapi/startapp?appId=20000116&actionType=toAccount&account=${
+                formData.paymentAddress
+              }${formData.amount ? '&amount=' + formData.amount : ''}`
+              break
+          }
+          break
         default:
           qrData = formData.text || ''
       }
@@ -730,6 +849,115 @@ END:VCARD`
             </div>
           </div>
         );
+      case 'PAYMENT':
+        return (
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="paymentType">Payment Method</Label>
+              <Select
+                value={formData.paymentType}
+                onValueChange={(value) => setFormData(prev => ({ ...prev, paymentType: value }))}
+              >
+                <SelectTrigger id="paymentType" className="w-full">
+                  <SelectValue placeholder="Select payment method" />
+                </SelectTrigger>
+                <SelectContent>
+                  {PAYMENT_TYPES.map(({ value, label }) => (
+                    <SelectItem key={value} value={value}>
+                      {label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="paymentAddress">
+                {formData.paymentType === 'paypal' ? 'PayPal Username' :
+                 formData.paymentType === 'bitcoin' ? 'Bitcoin Address' :
+                 formData.paymentType === 'ethereum' ? 'Ethereum Address' :
+                 formData.paymentType === 'litecoin' ? 'Litecoin Address' :
+                 formData.paymentType === 'dogecoin' ? 'Dogecoin Address' :
+                 formData.paymentType === 'solana' ? 'Solana Address' :
+                 formData.paymentType === 'usdt' ? 'USDT Address' :
+                 formData.paymentType === 'usdc' ? 'USDC Address' :
+                 formData.paymentType === 'cashapp' ? 'Cash App $Cashtag' :
+                 formData.paymentType === 'venmo' ? 'Venmo Username' :
+                 formData.paymentType === 'googlepay' ? 'Phone Number/UPI' :
+                 formData.paymentType === 'wechat' ? 'WeChat ID' :
+                 formData.paymentType === 'alipay' ? 'Alipay ID' :
+                 'Payment Address'}
+              </Label>
+              <Input
+                id="paymentAddress"
+                placeholder={
+                  formData.paymentType === 'paypal' ? 'username' :
+                  formData.paymentType === 'bitcoin' ? '1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa' :
+                  formData.paymentType === 'ethereum' ? '0x742d35Cc6634C0532925a3b844Bc454e4438f44e' :
+                  formData.paymentType === 'litecoin' ? 'LTC address' :
+                  formData.paymentType === 'dogecoin' ? 'DOGE address' :
+                  formData.paymentType === 'solana' ? 'SOL address' :
+                  formData.paymentType === 'usdt' ? 'USDT address' :
+                  formData.paymentType === 'usdc' ? 'USDC address' :
+                  formData.paymentType === 'cashapp' ? 'Cash App $Cashtag' :
+                  formData.paymentType === 'venmo' ? 'Venmo username' :
+                  formData.paymentType === 'googlepay' ? 'Phone number/UPI' :
+                  formData.paymentType === 'wechat' ? 'WeChat ID' :
+                  formData.paymentType === 'alipay' ? 'Alipay ID' :
+                  'Enter payment address'
+                }
+                value={formData.paymentAddress || ''}
+                onChange={(e) => setFormData(prev => ({ ...prev, paymentAddress: e.target.value }))}
+                className="w-full"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="amount">Amount (Optional)</Label>
+              <Input
+                id="amount"
+                type="number"
+                step="any"
+                placeholder="Enter amount"
+                value={formData.amount || ''}
+                onChange={(e) => setFormData(prev => ({ ...prev, amount: e.target.value }))}
+                className="w-full"
+              />
+            </div>
+
+            {formData.paymentType === 'paypal' && (
+              <div className="space-y-2">
+                <Label htmlFor="currency">Currency</Label>
+                <Select
+                  value={formData.currency || 'USD'}
+                  onValueChange={(value) => setFormData(prev => ({ ...prev, currency: value }))}
+                >
+                  <SelectTrigger id="currency" className="w-full">
+                    <SelectValue placeholder="Select currency" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {PAYPAL_CURRENCIES.map(({ value, label }) => (
+                      <SelectItem key={value} value={value}>
+                        {label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+
+            <div className="space-y-2">
+              <Label htmlFor="message">Message (Optional)</Label>
+              <Textarea
+                id="message"
+                placeholder="Enter payment message or note"
+                value={formData.message || ''}
+                onChange={(e) => setFormData(prev => ({ ...prev, message: e.target.value }))}
+                className="w-full"
+              />
+            </div>
+          </div>
+        )
       default:
         return (
           <div className="space-y-2">
