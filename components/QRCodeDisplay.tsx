@@ -29,25 +29,16 @@ export function QRCodeDisplay({
   logo
 }: QRCodeDisplayProps) {
   const [qrImageBlob, setQrImageBlob] = useState<Blob | null>(null)
-  const [downloadFormat, setDownloadFormat] = useState<'png' | 'svg' | 'pdf'>('png')
+  const [downloadFormat, setDownloadFormat] = useState<'png' | 'pdf'>('png')
   const [downloadSize, setDownloadSize] = useState<string>('300')
   const qrRef = useRef<HTMLDivElement>(null)
 
-  const generateQRImage = async (format: 'png' | 'svg' | 'pdf', size: number) => {
-    if (!qrRef.current) return null
+  const generateQRImage = async (format: 'png' | 'pdf', size: number) => {
+    if (!qrRef.current || !value) return null
 
     try {
       const padding = 40
-      const scale = size / 256 // 256 is the base size of QR code
-
-      if (format === 'svg') {
-        const svgElement = qrRef.current.querySelector('svg')
-        if (!svgElement) return null
-
-        const svgData = new XMLSerializer().serializeToString(svgElement)
-        const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' })
-        return svgBlob
-      }
+      const scale = size / 256
 
       const canvas = await html2canvas(qrRef.current, {
         backgroundColor: '#FFFFFF',
@@ -132,7 +123,7 @@ export function QRCodeDisplay({
           
           <div className="relative w-64 h-64">
             <QRCode
-              value={value || 'https://example.com'}
+              value={value || ''}
               size={256}
               level="H"
               fgColor={color}
@@ -158,23 +149,20 @@ export function QRCodeDisplay({
       </div>
 
       <div className={`
-        w-full max-w-md flex gap-2 justify-center flex-wrap
-        ${frameLabelPosition === 'bottom' ? 'mt-16' : 'mt-4'}
-        transition-opacity duration-300
-        ${value ? 'opacity-100' : 'opacity-50'}
+        flex flex-col gap-4 w-full max-w-md mx-auto
+        ${frameLabelPosition === 'bottom' ? 'mt-20' : 'mt-12'}
       `}>
-        <div className="flex gap-2 w-full">
+        {/* Format and Size Controls Row */}
+        <div className="flex justify-center gap-4">
           <Select
             value={downloadFormat}
-            onValueChange={(value: 'png' | 'svg' | 'pdf') => setDownloadFormat(value)}
-            disabled={!value}
+            onValueChange={(value: 'png' | 'pdf') => setDownloadFormat(value)}
           >
             <SelectTrigger className="w-[120px]">
               <SelectValue placeholder="Format" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="png">PNG</SelectItem>
-              <SelectItem value="svg">SVG</SelectItem>
               <SelectItem value="pdf">PDF</SelectItem>
             </SelectContent>
           </Select>
@@ -182,7 +170,6 @@ export function QRCodeDisplay({
           <Select
             value={downloadSize}
             onValueChange={setDownloadSize}
-            disabled={!value}
           >
             <SelectTrigger className="w-[120px]">
               <SelectValue placeholder="Size" />
@@ -198,23 +185,19 @@ export function QRCodeDisplay({
           </Select>
         </div>
 
-        <Button 
-          onClick={handleDownload}
-          disabled={!value}
-          className="flex-1 flex items-center justify-center"
-        >
-          <Download className="mr-2 h-4 w-4" />
-          Download {downloadFormat.toUpperCase()}
-        </Button>
-
-        <ShareButton
-          disabled={!value}
-          qrCodeUrl={qrImageBlob ? URL.createObjectURL(qrImageBlob) : ''}
-          title="Check out this QR Code"
-          description="Generated with QR Code Generator"
-          className="flex-1"
-        />
+        {/* Download and Share Buttons Row */}
+        <div className="flex justify-center gap-4">
+          <Button
+            variant="default"
+            className="w-[120px]"
+            onClick={handleDownload}
+          >
+            <Download className="mr-2 h-4 w-4" />
+            Download
+          </Button>
+          <ShareButton value={value} className="w-[120px]" />
+        </div>
       </div>
     </div>
   )
-} 
+}
