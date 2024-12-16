@@ -14,14 +14,16 @@ import { useToast } from "@/hooks/use-toast"
 interface DynamicFormProps {
   type: string
   onGenerate: (data: string) => void
+  formData: FormDataType
+  setFormData: React.Dispatch<React.SetStateAction<FormDataType>>
 }
 
-const APP_STORES = [
-  { value: 'apple', label: 'Apple App Store', icon: Apple },
-  { value: 'google', label: 'Google Play Store', icon: Store },
-  { value: 'amazon', label: 'Amazon Appstore', icon: ShoppingBag },
-  { value: 'chrome', label: 'Chrome Web Store', icon: Chrome },
-] as const
+const APP_STORE_OPTIONS = [
+  { value: 'APPLE', label: 'Apple App Store', icon: Apple },
+  { value: 'GOOGLE', label: 'Google Play Store', icon: Store },
+  { value: 'AMAZON', label: 'Amazon App Store', icon: ShoppingBag },
+  { value: 'CHROME', label: 'Chrome Web Store', icon: Chrome }
+]
 
 const WIFI_ENCRYPTION_TYPES = [
   { value: 'nopass', label: 'None' },
@@ -116,22 +118,24 @@ interface FormDataType {
   paymentAddress?: string
   amount?: string
   currency?: string
+  logo?: string | undefined
 }
 
-export function DynamicForm({ type, onGenerate }: DynamicFormProps) {
-  const [formData, setFormData] = useState<FormDataType>({
-    wifiHidden: false,
-    wifiEncryption: 'WPA'
-  })
+export function DynamicForm({ type, onGenerate, formData, setFormData }: DynamicFormProps) {
   const [isGenerating, setIsGenerating] = useState(false)
   const { toast } = useToast()
+
+  const handleFieldChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }))
+  }
 
   useEffect(() => {
     setFormData({
       wifiHidden: false,
-      wifiEncryption: 'WPA'
+      wifiEncryption: 'WPA',
+      logo: undefined
     })
-  }, [type])
+  }, [type, setFormData])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -143,16 +147,16 @@ export function DynamicForm({ type, onGenerate }: DynamicFormProps) {
       switch (type) {
         case 'APP_STORE':
           switch (formData.store) {
-            case 'apple':
+            case 'APPLE':
               qrData = `https://apps.apple.com/app/${formData.appId}`
               break
-            case 'google':
+            case 'GOOGLE':
               qrData = `https://play.google.com/store/apps/details?id=${formData.appId}`
               break
-            case 'amazon':
+            case 'AMAZON':
               qrData = `https://www.amazon.com/dp/${formData.appId}`
               break
-            case 'chrome':
+            case 'CHROME':
               qrData = `https://chrome.google.com/webstore/detail/${formData.appId}`
               break
           }
@@ -332,24 +336,20 @@ END:VCARD`
       case 'APP_STORE':
         return (
           <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="store">App Store</Label>
-              <Select 
-                value={formData.store} 
-                onValueChange={(value) => setFormData(prev => ({ ...prev, store: value }))}
+            <div>
+              <Label htmlFor="store">Store</Label>
+              <Select
+                value={formData.store}
+                onValueChange={(value) => handleFieldChange('store', value)}
               >
-                <SelectTrigger id="store" className="w-full">
-                  <SelectValue placeholder="Select app store" />
+                <SelectTrigger>
+                  <SelectValue placeholder="Select store" />
                 </SelectTrigger>
                 <SelectContent>
-                  {APP_STORES.map(({ value, label, icon: Icon }) => (
-                    <SelectItem 
-                      key={value} 
-                      value={value}
-                      className="flex items-center space-x-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
-                    >
+                  {APP_STORE_OPTIONS.map(({ value, label, icon: Icon }) => (
+                    <SelectItem key={value} value={value}>
                       <div className="flex items-center gap-2">
-                        <Icon className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+                        <Icon className="h-4 w-4" />
                         <span>{label}</span>
                       </div>
                     </SelectItem>
@@ -357,24 +357,13 @@ END:VCARD`
                 </SelectContent>
               </Select>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="appId">
-                {formData.store === 'apple' ? 'App ID or Bundle ID' :
-                 formData.store === 'google' ? 'Package Name' :
-                 formData.store === 'amazon' ? 'ASIN' :
-                 formData.store === 'chrome' ? 'Extension ID' : 'App ID'}
-              </Label>
+            <div>
+              <Label htmlFor="appId">App ID or URL</Label>
               <Input
                 id="appId"
-                placeholder={
-                  formData.store === 'apple' ? 'id123456789 or com.example.app' :
-                  formData.store === 'google' ? 'com.example.app' :
-                  formData.store === 'amazon' ? 'B01234567' :
-                  formData.store === 'chrome' ? 'extension-id' : 'Enter app ID'
-                }
                 value={formData.appId || ''}
-                onChange={(e) => setFormData(prev => ({ ...prev, appId: e.target.value }))}
-                className="w-full"
+                onChange={(e) => handleFieldChange('appId', e.target.value)}
+                placeholder={getAppIdPlaceholder(formData.store)}
               />
             </div>
           </div>
@@ -974,9 +963,25 @@ END:VCARD`
     }
   }
 
+  const getAppIdPlaceholder = (store?: string) => {
+    switch (store) {
+      case 'APPLE':
+        return 'e.g., id123456789'
+      case 'GOOGLE':
+        return 'e.g., com.example.app'
+      case 'AMAZON':
+        return 'e.g., B00CXXX'
+      case 'CHROME':
+        return 'e.g., extension-id'
+      default:
+        return 'Enter app ID or URL'
+    }
+  }
+
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {renderFields()}
+      
       <Button 
         type="submit" 
         className="w-full relative"

@@ -10,6 +10,60 @@ import { ThemeToggle } from './components/ThemeToggle'
 import { Footer } from '@/components/Footer'
 import { Logo } from '@/components/Logo'
 
+interface FormDataType {
+  // Basic fields
+  text?: string
+  wifiHidden: boolean
+  wifiEncryption: string
+  ssid?: string
+  password?: string
+  social?: string
+  url?: string
+  phone?: string
+  email?: string
+  latitude?: string
+  longitude?: string
+  store?: string
+  appId?: string
+  message?: string
+
+  // vCard fields
+  firstName?: string
+  lastName?: string
+  company?: string
+  jobTitle?: string
+  mobile?: string
+  fax?: string
+  website?: string
+  street?: string
+  city?: string
+  country?: string
+
+  // Event fields
+  title?: string
+  location?: string
+  startTime?: string
+  endTime?: string
+  reminder?: string
+  notes?: string
+
+  // Email fields
+  subject?: string
+  body?: string
+
+  // Meeting fields
+  meetingId?: string
+
+  // Payment fields
+  paymentType?: string
+  paymentAddress?: string
+  amount?: string
+  currency?: string
+
+  // Logo fields
+  logo?: string | undefined
+}
+
 export default function QRCodeGenerator() {
   const [selectedType, setSelectedType] = useState('URL')
   const [qrData, setQRData] = useState('')
@@ -18,7 +72,12 @@ export default function QRCodeGenerator() {
   const [frame, setFrame] = useState('rounded')
   const [frameLabel, setFrameLabel] = useState('Scan Me')
   const [frameLabelPosition, setFrameLabelPosition] = useState<'top' | 'bottom'>('bottom')
-  const [logo, setLogo] = useState('')
+  const [logo, setLogo] = useState<string | undefined>(undefined)
+  const [formData, setFormData] = useState<FormDataType>({
+    wifiHidden: false,
+    wifiEncryption: 'WPA',
+    logo: undefined
+  })
 
   const handleGenerate = (data: string) => {
     setQRData(data)
@@ -44,7 +103,12 @@ export default function QRCodeGenerator() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative">
               <div>
                 <TypeSelector selectedType={selectedType} onTypeChange={setSelectedType} />
-                <DynamicForm type={selectedType} onGenerate={setQRData} />
+                <DynamicForm 
+                  type={selectedType} 
+                  onGenerate={setQRData}
+                  formData={formData}
+                  setFormData={setFormData}
+                />
               </div>
               <div className="md:hidden flex items-center justify-center py-4">
                 {qrData && (
@@ -61,7 +125,7 @@ export default function QRCodeGenerator() {
                   frame={frame} 
                   frameLabel={frameLabel}
                   frameLabelPosition={frameLabelPosition}
-                  logo={logo}
+                  logo={formData.logo}
                 />
                 <Customization
                   color={color}
@@ -69,12 +133,16 @@ export default function QRCodeGenerator() {
                   frame={frame}
                   frameLabel={frameLabel}
                   frameLabelPosition={frameLabelPosition}
+                  type={selectedType}
+                  paymentType={formData.paymentType}
                   onColorChange={setColor}
                   onBgColorChange={setBgColor}
                   onFrameChange={setFrame}
                   onFrameLabelChange={setFrameLabel}
                   onFrameLabelPositionChange={setFrameLabelPosition}
                   onLogoChange={setLogo}
+                  formData={formData}
+                  setFormData={setFormData}
                 />
               </div>
             </div>
