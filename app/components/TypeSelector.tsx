@@ -13,7 +13,8 @@ import {
   Smartphone,
   Globe,
   AppWindow,
-  Store
+  Store,
+  Calendar
 } from 'lucide-react'
 
 interface TypeSelectorProps {
@@ -22,6 +23,7 @@ interface TypeSelectorProps {
 }
 
 const QR_TYPES = [
+  { value: 'event', label: 'Calendar Event', icon: Calendar },
   { value: 'VCARD', label: 'vCard Contact', icon: CreditCard },
   { value: 'WIFI', label: 'WiFi Network', icon: Wifi },
   { value: 'SOCIAL', label: 'Social Profile', icon: Share2 },
@@ -62,4 +64,3 @@ export function TypeSelector({ selectedType, onTypeChange }: TypeSelectorProps) 
     </div>
   )
 }
-

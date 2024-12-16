@@ -6,6 +6,8 @@ import { Loader2 } from 'lucide-react'
 import { useToast } from "@/hooks/use-toast"
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Textarea } from '@/components/ui/textarea'
 
 interface DynamicFormProps {
   type: string
@@ -73,6 +75,89 @@ export function DynamicForm({ type, onGenerate }: DynamicFormProps) {
             />
           </div>
         )
+      case 'event':
+        return (
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="title">Event Title *</Label>
+              <Input
+                type="text"
+                id="title"
+                required
+                placeholder="Enter event title"
+                value={formData.title || ''}
+                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="location">Location</Label>
+              <Input
+                type="text"
+                id="location"
+                placeholder="Enter event location"
+                value={formData.location || ''}
+                onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="startTime">Start Time *</Label>
+              <Input
+                type="datetime-local"
+                id="startTime"
+                required
+                value={formData.startTime || ''}
+                onChange={(e) => setFormData({ ...formData, startTime: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="endTime">End Time *</Label>
+              <Input
+                type="datetime-local"
+                id="endTime"
+                required
+                value={formData.endTime || ''}
+                onChange={(e) => setFormData({ ...formData, endTime: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="reminder">Reminder Before Event</Label>
+              <Select 
+                value={formData.reminder || '15'} 
+                onValueChange={(value) => setFormData({ ...formData, reminder: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select reminder time" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="5">5 minutes</SelectItem>
+                  <SelectItem value="15">15 minutes</SelectItem>
+                  <SelectItem value="30">30 minutes</SelectItem>
+                  <SelectItem value="60">1 hour</SelectItem>
+                  <SelectItem value="120">2 hours</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="url">Link (Optional)</Label>
+              <Input
+                type="url"
+                id="url"
+                placeholder="Enter related URL"
+                value={formData.url || ''}
+                onChange={(e) => setFormData({ ...formData, url: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="notes">Notes</Label>
+              <Textarea
+                id="notes"
+                placeholder="Add any additional notes"
+                value={formData.notes || ''}
+                onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+              />
+            </div>
+          </div>
+        )
       default:
         return null
     }
@@ -94,6 +179,37 @@ export function DynamicForm({ type, onGenerate }: DynamicFormProps) {
           break
         case 'Text':
           qrData = formData.text || ''
+          break
+        case 'event':
+          const startDate = new Date(formData.startTime || '')
+          const endDate = new Date(formData.endTime || '')
+          const reminderMinutes = parseInt(formData.reminder || '15')
+          
+          // Format dates for iCalendar
+          const formatDate = (date: Date) => {
+            return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z'
+          }
+          
+          const eventData = [
+            'BEGIN:VCALENDAR',
+            'VERSION:2.0',
+            'BEGIN:VEVENT',
+            `SUMMARY:${formData.title || ''}`,
+            `DTSTART:${formatDate(startDate)}`,
+            `DTEND:${formatDate(endDate)}`,
+            formData.location ? `LOCATION:${formData.location}` : '',
+            formData.url ? `URL:${formData.url}` : '',
+            formData.notes ? `DESCRIPTION:${formData.notes}` : '',
+            `BEGIN:VALARM`,
+            `TRIGGER:-PT${reminderMinutes}M`,
+            `ACTION:DISPLAY`,
+            `DESCRIPTION:Reminder`,
+            `END:VALARM`,
+            'END:VEVENT',
+            'END:VCALENDAR'
+          ].filter(Boolean).join('\n')
+          
+          qrData = eventData
           break
         default:
           qrData = ''
