@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
 import { Input } from "@/components/ui/input"
 import Image from 'next/image'
-import { FormDataType } from '@/app/components/DynamicForm'
+import { FormDataType } from '@/app/types'
 
 interface LogoSelectorProps {
   type: string

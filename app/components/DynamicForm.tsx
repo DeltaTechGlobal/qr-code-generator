@@ -10,6 +10,7 @@ import { Apple, ShoppingBag, Chrome, Store, Loader2 } from 'lucide-react'
 import { Checkbox } from "@/components/ui/checkbox"
 import { CheckedState } from "@radix-ui/react-checkbox"
 import { useToast } from "@/hooks/use-toast"
+import { FormDataType } from '@/app/types'
 
 interface DynamicFormProps {
   type: string
@@ -76,50 +77,6 @@ const PAYPAL_CURRENCIES = [
   { value: 'THB', label: 'Thai Baht (THB)' },
   { value: 'USD', label: 'United States Dollar (USD)' }
 ] as const
-
-interface FormDataType {
-  text?: string
-  wifiHidden: boolean
-  wifiEncryption: string
-  ssid?: string
-  password?: string
-  social?: string
-  url?: string
-  phone?: string
-  email?: string
-  latitude?: string
-  longitude?: string
-  store?: string
-  appId?: string
-  message?: string
-  // vCard fields
-  firstName?: string
-  lastName?: string
-  company?: string
-  jobTitle?: string
-  mobile?: string
-  fax?: string
-  website?: string
-  street?: string
-  city?: string
-  country?: string
-  // Event fields
-  title?: string
-  location?: string
-  startTime?: string
-  endTime?: string
-  reminder?: string
-  notes?: string
-  // Enhanced email fields
-  subject?: string
-  body?: string
-  meetingId?: string
-  paymentType?: string
-  paymentAddress?: string
-  amount?: string
-  currency?: string
-  logo?: string | undefined
-}
 
 export function DynamicForm({ type, onGenerate, formData, setFormData }: DynamicFormProps) {
   const [isGenerating, setIsGenerating] = useState(false)
