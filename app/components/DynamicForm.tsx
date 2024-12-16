@@ -65,6 +65,7 @@ interface FormDataType {
   // Enhanced email fields
   subject?: string
   body?: string
+  meetingId?: string
 }
 
 export function DynamicForm({ type, onGenerate }: DynamicFormProps) {
@@ -175,6 +176,9 @@ END:VCARD`
           
           qrData = eventData
           break
+        case 'zoom':
+          qrData = `zoommtg://zoom.us/join?confno=${formData.meetingId}&pwd=${formData.password}`;
+          break;
         default:
           qrData = formData.text || ''
       }
@@ -695,6 +699,37 @@ END:VCARD`
             </div>
           </div>
         )
+      case 'zoom':
+        return (
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="meetingId">Meeting ID *</Label>
+              <Input
+                id="meetingId"
+                required
+                placeholder="Enter Zoom meeting ID"
+                value={formData.meetingId || ''}
+                onChange={(e) => setFormData(prev => ({ ...prev, meetingId: e.target.value }))}
+                className="w-full"
+              />
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Example: 123 456 7890
+              </p>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="password">Meeting Password *</Label>
+              <Input
+                id="password"
+                required
+                type="text"
+                placeholder="Enter meeting password"
+                value={formData.password || ''}
+                onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
+                className="w-full"
+              />
+            </div>
+          </div>
+        );
       default:
         return (
           <div className="space-y-2">

@@ -13,7 +13,8 @@ import {
   MessageSquare,
   Globe,
   Store,
-  Calendar
+  Calendar,
+  Video
 } from 'lucide-react'
 
 interface TypeSelectorProps {
@@ -21,7 +22,16 @@ interface TypeSelectorProps {
   onTypeChange: (value: string) => void
 }
 
-const QR_TYPES = [
+export type QRCodeType = 
+  | 'text' 
+  | 'url' 
+  | 'email' 
+  | 'phone' 
+  | 'sms' 
+  | 'wifi' 
+  | 'zoom'
+
+export const typeOptions = [
   { value: 'Event', label: 'Calendar Event', icon: Calendar },
   { value: 'VCARD', label: 'vCard Contact', icon: CreditCard },
   { value: 'WIFI', label: 'WiFi Network', icon: Wifi },
@@ -33,6 +43,7 @@ const QR_TYPES = [
   { value: 'EMAIL', label: 'Compose Email', icon: Mail },
   { value: 'GEO', label: 'Location', icon: MapPin },
   { value: 'TEXT', label: 'Plain Text', icon: FileText },
+  { value: 'zoom', label: 'Zoom Meeting', icon: Video },
 ] as const
 
 export function TypeSelector({ selectedType, onTypeChange }: TypeSelectorProps) {
@@ -47,7 +58,7 @@ export function TypeSelector({ selectedType, onTypeChange }: TypeSelectorProps) 
             <SelectValue placeholder="Select type" />
           </SelectTrigger>
           <SelectContent>
-            {QR_TYPES.map(({ value, label, icon: Icon }) => (
+            {typeOptions.map(({ value, label, icon: Icon }) => (
               <SelectItem 
                 key={value} 
                 value={value}
