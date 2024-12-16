@@ -195,7 +195,13 @@ export function QRCodeDisplay({
             <Download className="mr-2 h-4 w-4" />
             Download
           </Button>
-          <ShareButton value={value} className="w-[120px]" />
+          <ShareButton 
+            disabled={!value}
+            qrCodeUrl={qrImageBlob ? URL.createObjectURL(qrImageBlob) : ''}
+            title="Share QR Code"
+            description="Share this QR code with others"
+            className="w-[120px]"
+          />
         </div>
       </div>
     </div>

@@ -38,29 +38,31 @@ const QR_TYPES = [
 
 export function TypeSelector({ selectedType, onTypeChange }: TypeSelectorProps) {
   return (
-    <div className="w-full space-y-2">
-      <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-        QR Code Type
-      </label>
-      <Select value={selectedType} onValueChange={onTypeChange}>
-        <SelectTrigger className="w-full">
-          <SelectValue placeholder="Select type" />
-        </SelectTrigger>
-        <SelectContent>
-          {QR_TYPES.map(({ value, label, icon: Icon }) => (
-            <SelectItem 
-              key={value} 
-              value={value}
-              className="flex items-center space-x-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
-            >
-              <div className="flex items-center gap-2">
-                <Icon className="h-4 w-4 text-gray-500 dark:text-gray-400" />
-                <span>{label}</span>
-              </div>
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+    <div className="space-y-4">
+      <div className="flex flex-col space-y-2">
+        <label className="text-xl font-semibold text-gray-700 dark:text-gray-300">
+          QR Code Type
+        </label>
+        <Select value={selectedType} onValueChange={onTypeChange}>
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="Select type" />
+          </SelectTrigger>
+          <SelectContent>
+            {QR_TYPES.map(({ value, label, icon: Icon }) => (
+              <SelectItem 
+                key={value} 
+                value={value}
+                className="flex items-center space-x-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
+              >
+                <div className="flex items-center gap-2">
+                  <Icon className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+                  <span>{label}</span>
+                </div>
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
     </div>
   )
 }
