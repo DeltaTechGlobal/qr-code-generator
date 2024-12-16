@@ -38,7 +38,7 @@ export const typeOptions = [
   { value: 'VCARD', label: 'vCard Contact', icon: CreditCard },
   { value: 'WIFI', label: 'WiFi Network', icon: Wifi },
   { value: 'SOCIAL', label: 'Social Profile', icon: Share2 },
-  { value: 'APP_STORE', label: 'App Store Link', icon: Store },
+  { value: 'APP_STORE', label: 'App Store', icon: Store },
   { value: 'URL', label: 'Website URL', icon: Globe },
   { value: 'SMS', label: 'SMS Message', icon: MessageSquare },
   { value: 'PHONE', label: 'Phone Number', icon: Phone },

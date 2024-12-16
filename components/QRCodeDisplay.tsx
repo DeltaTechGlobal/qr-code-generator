@@ -16,7 +16,7 @@ interface QRCodeDisplayProps {
   frame: string
   frameLabel: string
   frameLabelPosition: 'top' | 'bottom'
-  logo?: string
+  logo?: string | null
 }
 
 export function QRCodeDisplay({
