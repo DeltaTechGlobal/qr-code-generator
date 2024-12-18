@@ -6,12 +6,65 @@ import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Apple, ShoppingBag, Chrome, Store, Loader2, QrCode } from 'lucide-react'
+import { Apple, ShoppingBag, Chrome, Store, Loader2, QrCode, Twitter } from 'lucide-react'
 import { Checkbox } from "@/components/ui/checkbox"
 import { CheckedState } from "@radix-ui/react-checkbox"
 import { useToast } from "@/hooks/use-toast"
-import { FormDataType } from '@/app/types'
 import { cn } from "@/lib/utils"
+
+interface FormDataType {
+  // Basic fields
+  text?: string
+  wifiHidden: boolean
+  wifiEncryption: string
+  ssid?: string
+  password?: string
+  social?: string
+  url?: string
+  phone?: string
+  email?: string
+  latitude?: string
+  longitude?: string
+  store?: string
+  appId?: string
+  message?: string
+
+  // vCard fields
+  firstName?: string
+  lastName?: string
+  company?: string
+  jobTitle?: string
+  mobile?: string
+  fax?: string
+  website?: string
+  street?: string
+  city?: string
+  country?: string
+
+  // Event fields
+  title?: string
+  location?: string
+  startTime?: string
+  endTime?: string
+  reminder?: string
+  notes?: string
+
+  // Email fields
+  subject?: string
+  body?: string
+
+  // Meeting fields
+  meetingId?: string
+
+  // Payment fields
+  paymentType?: string
+  paymentAddress?: string
+  amount?: string
+  currency?: string
+
+  // Logo fields
+  logo?: string | undefined
+}
 
 interface DynamicFormProps {
   type: string
@@ -259,6 +312,10 @@ END:VCARD`
               }${formData.amount ? '&amount=' + formData.amount : ''}`
               break
           }
+          break
+        case 'TWITTER':
+          const tweetText = encodeURIComponent(formData.text || '')
+          qrData = `https://twitter.com/intent/tweet?text=${tweetText}`
           break
         default:
           qrData = formData.text || ''
@@ -902,6 +959,31 @@ END:VCARD`
                 onChange={(e) => setFormData(prev => ({ ...prev, message: e.target.value }))}
                 className="w-full"
               />
+            </div>
+          </div>
+        )
+      case 'TWITTER':
+        return (
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="tweet">Compose your X tweet</Label>
+              <div className="relative">
+                <Textarea
+                  id="tweet"
+                  placeholder="What's on your mind?"
+                  value={formData.text || ''}
+                  onChange={(e) => {
+                    const text = e.target.value
+                    if (text.length <= 280) {
+                      setFormData(prev => ({ ...prev, text: text }))
+                    }
+                  }}
+                  className="w-full min-h-[100px] pr-16"
+                />
+                <div className="absolute bottom-2 right-2 text-sm text-gray-500 dark:text-gray-400">
+                  {(formData.text?.length || 0)}/280
+                </div>
+              </div>
             </div>
           </div>
         )

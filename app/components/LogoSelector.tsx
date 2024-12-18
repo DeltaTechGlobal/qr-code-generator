@@ -47,7 +47,8 @@ const QR_TYPE_LOGOS: Record<string, string> = {
   'APP_STORE_APPLE': '/logos/appstore.svg',
   'APP_STORE_GOOGLE': '/logos/playstore.svg',
   'APP_STORE_AMAZON': '/logos/amazonappstore.svg',
-  'APP_STORE_CHROME': '/logos/chromewebstore.svg'
+  'APP_STORE_CHROME': '/logos/chromewebstore.svg',
+  'TWITTER': '/logos/x-logo.svg'
 }
 
 export function LogoSelector({ type, paymentType, onLogoChange, formData }: LogoSelectorProps) {
@@ -85,7 +86,21 @@ export function LogoSelector({ type, paymentType, onLogoChange, formData }: Logo
       const defaultLogo = getDefaultLogo()
       setUseCustomLogo(defaultLogo !== formData.logo)
     }
-  }, [type, paymentType, formData])
+
+    if (!useCustomLogo) {
+      if (type === 'TWITTER') {
+        setUseLogo(true)
+        onLogoChange(QR_TYPE_LOGOS.TWITTER)
+      } else if (type === 'PAYMENT' && paymentType) {
+        const defaultLogo = getDefaultLogo()
+        if (defaultLogo) {
+          onLogoChange(defaultLogo)
+        }
+      } else if (!formData?.logo) {
+        onLogoChange(undefined)
+      }
+    }
+  }, [type, paymentType])
 
   const handleLogoToggle = (checked: boolean) => {
     setUseLogo(checked)

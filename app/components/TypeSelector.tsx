@@ -15,7 +15,8 @@ import {
   Store,
   Calendar,
   Video,
-  Wallet
+  Wallet,
+  Twitter
 } from 'lucide-react'
 
 interface TypeSelectorProps {
@@ -32,6 +33,7 @@ export type QRCodeType =
   | 'wifi' 
   | 'zoom'
   | 'payment'
+  | 'TWITTER'
 
 export const typeOptions = [
   { value: 'Event', label: 'Calendar Event', icon: Calendar },
@@ -47,6 +49,7 @@ export const typeOptions = [
   { value: 'TEXT', label: 'Plain Text', icon: FileText },
   { value: 'zoom', label: 'Zoom Meeting', icon: Video },
   { value: 'PAYMENT', label: 'Payment', icon: Wallet },
+  { value: 'TWITTER', label: 'X Tweet', icon: Twitter },
 ] as const
 
 export function TypeSelector({ selectedType, onTypeChange }: TypeSelectorProps) {

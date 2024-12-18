@@ -207,14 +207,24 @@ export function QRCodeDisplay({
             onValueChange={(value: 'png' | 'pdf') => setDownloadFormat(value)}
           >
             <SelectTrigger className={cn(
-              "w-[120px] bg-white border-gray-200",
-              "hover:bg-gray-50 transition-colors duration-200"
+              "w-[120px] bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700",
+              "hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
             )}>
               <SelectValue placeholder="Format" />
             </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="png">PNG</SelectItem>
-              <SelectItem value="pdf">PDF</SelectItem>
+            <SelectContent className="bg-white dark:bg-gray-800">
+              <SelectItem 
+                value="png" 
+                className="text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700"
+              >
+                PNG
+              </SelectItem>
+              <SelectItem 
+                value="pdf"
+                className="text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700"
+              >
+                PDF
+              </SelectItem>
             </SelectContent>
           </Select>
 
@@ -223,18 +233,21 @@ export function QRCodeDisplay({
             onValueChange={setDownloadSize}
           >
             <SelectTrigger className={cn(
-              "w-[120px] bg-white border-gray-200",
-              "hover:bg-gray-50 transition-colors duration-200"
+              "w-[120px] bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700",
+              "hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
             )}>
               <SelectValue placeholder="Size" />
             </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="300">300px</SelectItem>
-              <SelectItem value="400">400px</SelectItem>
-              <SelectItem value="500">500px</SelectItem>
-              <SelectItem value="600">600px</SelectItem>
-              <SelectItem value="700">700px</SelectItem>
-              <SelectItem value="800">800px</SelectItem>
+            <SelectContent className="bg-white dark:bg-gray-800">
+              {['300', '400', '500', '600', '700', '800'].map((size) => (
+                <SelectItem 
+                  key={size}
+                  value={size}
+                  className="text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700"
+                >
+                  {size}px
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>

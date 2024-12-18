@@ -32,7 +32,8 @@ const logoUrls = {
   'payment': 'https://raw.githubusercontent.com/feathericons/feather/master/icons/credit-card.svg',
   'playstore': 'https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/googleplay.svg',
   'amazonappstore': 'https://raw.githubusercontent.com/feathericons/feather/master/icons/shopping-bag.svg',
-  'chromewebstore': 'https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/googlechrome.svg'
+  'chromewebstore': 'https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/googlechrome.svg',
+  'x-logo': 'https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/x.svg'
 };
 
 // Create logos directory if it doesn't exist
