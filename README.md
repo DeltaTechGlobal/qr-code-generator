@@ -1,12 +1,12 @@
 # QR Code Generator
 
-A modern, feature-rich QR code generator built with Next.js and TypeScript. Create customized QR codes for various purposes with an intuitive user interface.
+A modern, feature-rich QR code generator built with Next.js and TypeScript. Create, scan, and learn about QR codes with an intuitive user interface.
 
 ![QR Code Generator Screenshot](public/screenshot.png)
 
 ## Features
 
-### Multiple QR Code Types
+### Generate QR Codes
 - **vCard Contact**: Create QR codes for contact information
 - **WiFi Network**: Share WiFi credentials securely
 - **Social Profile**: Link to social media profiles
@@ -17,14 +17,30 @@ A modern, feature-rich QR code generator built with Next.js and TypeScript. Crea
 - **Email Address**: Direct email QR codes
 - **Location**: Share geographical coordinates
 - **Plain Text**: Encode any text message
-- **Payment**: Generate payment QR codes for PayPal, Bitcoin, and Ethereum
+- **Payment**: Generate payment QR codes (PayPal, Bitcoin, Ethereum)
 
 ### Customization Options
-- Custom colors for QR code and background
-- Multiple frame styles
-- Customizable frame labels
-- Logo insertion capability
-- Adjustable frame label position
+- Custom colors with dark/light mode support
+- Background color selection
+- Frame templates with custom labels
+- Logo integration
+- Multiple download formats
+- Size customization
+
+### QR Code Scanner
+- Upload image files (PNG, JPG, GIF)
+- Drag and drop support
+- Instant QR code detection
+- Support for all QR code formats
+- Clear result display
+
+### Educational Resources
+- Comprehensive QR code guide
+- Best practices and tips
+- Common applications
+- Technical specifications
+- Security considerations
+- Implementation guidelines
 
 ## Tech Stack
 
@@ -36,6 +52,7 @@ A modern, feature-rich QR code generator built with Next.js and TypeScript. Crea
   - Shadcn UI
   - Lucide Icons
 - **QR Code**: qrcode.react
+- **Scanner**: jsQR
 - **Theme**: Dark/Light mode support
 
 ## Getting Started
@@ -126,6 +143,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Contact
 
-Your Name - [@yourtwitter](https://twitter.com/yourtwitter)
-
-Project Link: [https://github.com/yourusername/qr-code-generator](https://github.com/yourusername/qr-code-generator)
+Sabah u din Irfan - [@yourtwitter](https://twitter.com/sabahirfan)

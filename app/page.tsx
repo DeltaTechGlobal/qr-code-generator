@@ -1,87 +1,17 @@
 "use client"
 
 import { useState } from 'react'
-import { Card, CardContent } from "@/components/ui/card"
-import { TypeSelector } from '@/components/TypeSelector'
-import { DynamicForm } from '@/components/DynamicForm'
-import { QRCodeDisplay } from '@/components/QRCodeDisplay'
-import { Customization } from '@/components/Customization'
+import { Card } from "@/components/ui/card"
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
+import { QrCode as QRCode, ScanLine, GraduationCap, BookOpen, Library, HelpCircle, Lightbulb } from 'lucide-react'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { Footer } from '@/components/Footer'
 import { Logo } from '@/components/Logo'
+import { QRCodeGenerator } from '@/components/QRCodeGenerator'
+import { QRCodeScanner } from '@/components/QRCodeScanner'
+import { QRCodeInfo } from '@/components/QRCodeInfo'
 
-interface FormDataType {
-  // Basic fields
-  text?: string
-  wifiHidden: boolean
-  wifiEncryption: string
-  ssid?: string
-  password?: string
-  social?: string
-  url?: string
-  phone?: string
-  email?: string
-  latitude?: string
-  longitude?: string
-  store?: string
-  appId?: string
-  message?: string
-
-  // vCard fields
-  firstName?: string
-  lastName?: string
-  company?: string
-  jobTitle?: string
-  mobile?: string
-  fax?: string
-  website?: string
-  street?: string
-  city?: string
-  country?: string
-
-  // Event fields
-  title?: string
-  location?: string
-  startTime?: string
-  endTime?: string
-  reminder?: string
-  notes?: string
-
-  // Email fields
-  subject?: string
-  body?: string
-
-  // Meeting fields
-  meetingId?: string
-
-  // Payment fields
-  paymentType?: string
-  paymentAddress?: string
-  amount?: string
-  currency?: string
-
-  // Logo fields
-  logo?: string | undefined
-}
-
-export default function QRCodeGenerator() {
-  const [selectedType, setSelectedType] = useState('URL')
-  const [qrData, setQRData] = useState('')
-  const [color, setColor] = useState('#000000')
-  const [bgColor, setBgColor] = useState('#FFFFFF')
-  const [frame, setFrame] = useState('bottom-frame')
-  const [frameLabel, setFrameLabel] = useState('Scan Me')
-  const [logo, setLogo] = useState<string | undefined>(undefined)
-  const [formData, setFormData] = useState<FormDataType>({
-    wifiHidden: false,
-    wifiEncryption: 'WPA',
-    logo: undefined
-  })
-
-  const handleGenerate = (data: string) => {
-    setQRData(data)
-  }
-
+export default function Home() {
   return (
     <div className="min-h-screen flex flex-col">
       <div className="flex-grow bg-gradient-to-br from-blue-100 to-purple-100 dark:from-gray-800 dark:to-gray-900 flex flex-col items-center justify-center p-4">
@@ -93,59 +23,41 @@ export default function QRCodeGenerator() {
                 QR Code Generator
               </h1>
               <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                Generate custom QR codes for any purpose
+                Generate, scan, and learn about QR codes
               </p>
             </div>
             <ThemeToggle />
           </div>
         </div>
-        <Card className="w-full max-w-4xl bg-white dark:bg-gray-800 shadow-xl rounded-xl overflow-hidden">
-          <CardContent className="p-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative">
-              <div>
-                <TypeSelector selectedType={selectedType} onTypeChange={setSelectedType} />
-                <DynamicForm 
-                  type={selectedType} 
-                  onGenerate={setQRData}
-                  formData={formData}
-                  setFormData={setFormData}
-                />
-              </div>
-              <div className="md:hidden flex items-center justify-center py-4">
-                {qrData && (
-                  <div className="flex items-center text-sm text-gray-600 dark:text-gray-400 animate-bounce">
-                    <span>↓ Your QR Code is Ready Below ↓</span>
-                  </div>
-                )}
-              </div>
-              <div className="space-y-6">
-                <QRCodeDisplay 
-                  value={qrData} 
-                  color={color} 
-                  bgColor={bgColor} 
-                  frame={frame} 
-                  frameLabel={frameLabel}
-                  logo={formData.logo}
-                />
-                <Customization
-                  color={color}
-                  bgColor={bgColor}
-                  frame={frame}
-                  frameLabel={frameLabel}
-                  type={selectedType}
-                  paymentType={formData.paymentType}
-                  onColorChange={setColor}
-                  onBgColorChange={setBgColor}
-                  onFrameChange={setFrame}
-                  onFrameLabelChange={setFrameLabel}
-                  onLogoChange={setLogo}
-                  formData={formData}
-                  setFormData={setFormData}
-                />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+
+        <Tabs defaultValue="generate" className="w-full max-w-4xl">
+          <TabsList className="grid grid-cols-3 mb-4">
+            <TabsTrigger value="generate">
+              <QRCode className="h-4 w-4 mr-2" />
+              Generate
+            </TabsTrigger>
+            <TabsTrigger value="scan">
+              <ScanLine className="h-4 w-4 mr-2" />
+              Scan
+            </TabsTrigger>
+            <TabsTrigger value="info">
+              <GraduationCap className="h-4 w-4 mr-2" />
+              Learn
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="generate">
+            <QRCodeGenerator />
+          </TabsContent>
+
+          <TabsContent value="scan">
+            <QRCodeScanner />
+          </TabsContent>
+
+          <TabsContent value="info">
+            <QRCodeInfo />
+          </TabsContent>
+        </Tabs>
       </div>
       <Footer />
     </div>
