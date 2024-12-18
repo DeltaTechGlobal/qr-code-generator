@@ -5,9 +5,10 @@ import QRCode from 'qrcode.react'
 import { Button } from '@/components/ui/button'
 import html2canvas from 'html2canvas'
 import { Download, Share2, ChevronDown } from 'lucide-react'
-import { ShareButton } from './ShareButton'
+import { PrintButton } from './PrintButton'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { jsPDF } from 'jspdf'
+import { cn } from "@/lib/utils"
 
 interface QRCodeDisplayProps {
   value: string
@@ -205,7 +206,10 @@ export function QRCodeDisplay({
             value={downloadFormat}
             onValueChange={(value: 'png' | 'pdf') => setDownloadFormat(value)}
           >
-            <SelectTrigger className="w-[120px]">
+            <SelectTrigger className={cn(
+              "w-[120px] bg-white border-gray-200",
+              "hover:bg-gray-50 transition-colors duration-200"
+            )}>
               <SelectValue placeholder="Format" />
             </SelectTrigger>
             <SelectContent>
@@ -218,7 +222,10 @@ export function QRCodeDisplay({
             value={downloadSize}
             onValueChange={setDownloadSize}
           >
-            <SelectTrigger className="w-[120px]">
+            <SelectTrigger className={cn(
+              "w-[120px] bg-white border-gray-200",
+              "hover:bg-gray-50 transition-colors duration-200"
+            )}>
               <SelectValue placeholder="Size" />
             </SelectTrigger>
             <SelectContent>
@@ -232,22 +239,29 @@ export function QRCodeDisplay({
           </Select>
         </div>
 
-        {/* Download and Share Buttons Row */}
+        {/* Download and Print Buttons Row */}
         <div className="flex justify-center gap-4">
           <Button
             variant="default"
-            className="w-[120px]"
+            className={cn(
+              "w-[120px] bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800",
+              "text-white shadow-md hover:shadow-lg transition-all duration-200",
+              "border border-blue-700/20"
+            )}
             onClick={handleDownload}
+            disabled={!value}
           >
             <Download className="mr-2 h-4 w-4" />
             Download
           </Button>
-          <ShareButton 
+          <PrintButton 
             disabled={!value}
-            qrCodeUrl={qrImageBlob ? URL.createObjectURL(qrImageBlob) : ''}
-            title="Share QR Code"
-            description="Share this QR code with others"
-            className="w-[120px]"
+            qrCodeRef={qrRef}
+            className={cn(
+              "w-[120px] bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800",
+              "text-white shadow-md hover:shadow-lg transition-all duration-200",
+              "border border-blue-700/20"
+            )}
           />
         </div>
       </div>

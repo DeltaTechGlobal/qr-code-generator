@@ -6,11 +6,12 @@ import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Apple, ShoppingBag, Chrome, Store, Loader2 } from 'lucide-react'
+import { Apple, ShoppingBag, Chrome, Store, Loader2, QrCode } from 'lucide-react'
 import { Checkbox } from "@/components/ui/checkbox"
 import { CheckedState } from "@radix-ui/react-checkbox"
 import { useToast } from "@/hooks/use-toast"
 import { FormDataType } from '@/app/types'
+import { cn } from "@/lib/utils"
 
 interface DynamicFormProps {
   type: string
@@ -940,9 +941,12 @@ END:VCARD`
       {renderFields()}
       
       <Button 
-        type="submit" 
-        className="w-full relative"
-        disabled={isGenerating}
+        type="submit"
+        className={cn(
+          "w-full mt-4 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800",
+          "text-white shadow-md hover:shadow-lg transition-all duration-200",
+          "border border-blue-700/20"
+        )}
       >
         {isGenerating ? (
           <>
@@ -950,7 +954,10 @@ END:VCARD`
             Generating...
           </>
         ) : (
-          'Generate QR Code'
+          <>
+            <QrCode className="mr-2 h-4 w-4" />
+            Generate QR Code
+          </>
         )}
       </Button>
     </form>
