@@ -6,19 +6,25 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { LogoSelector } from './LogoSelector'
 import { FormDataType } from '@/app/types'
 
+const FRAME_STYLES = [
+  { value: 'bottom-frame', label: 'Bottom Frame' },
+  { value: 'top-frame', label: 'Top Frame' },
+  { value: 'bottom-tooltip', label: 'Bottom Tooltip' },
+  { value: 'top-header', label: 'Top Header' },
+  { value: 'none', label: 'No Frame' },
+] as const
+
 export function Customization({ 
   color, 
   bgColor, 
   frame, 
   frameLabel,
-  frameLabelPosition,
   type,
   paymentType,
   onColorChange, 
   onBgColorChange, 
   onFrameChange,
   onFrameLabelChange,
-  onFrameLabelPositionChange,
   onLogoChange,
   formData,
   setFormData
@@ -27,14 +33,12 @@ export function Customization({
   bgColor: string,
   frame: string,
   frameLabel: string,
-  frameLabelPosition: 'top' | 'bottom',
   type: string,
   paymentType?: string,
   onColorChange: (color: string) => void,
   onBgColorChange: (color: string) => void,
   onFrameChange: (frame: string) => void,
   onFrameLabelChange: (label: string) => void,
-  onFrameLabelPositionChange: (position: 'top' | 'bottom') => void,
   onLogoChange: (logo: string | undefined) => void,
   formData: FormDataType,
   setFormData: React.Dispatch<React.SetStateAction<FormDataType>>
@@ -89,40 +93,45 @@ export function Customization({
       {/* Frame Section */}
       <div className="space-y-4">
         <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">Frame</h3>
-        <div className="mt-4">
-          <Label htmlFor="frame" className="dark:text-gray-300">Frame Style</Label>
-          <Select value={frame} onValueChange={onFrameChange}>
-            <SelectTrigger id="frame">
-              <SelectValue placeholder="Choose a frame" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="none">No Frame</SelectItem>
-              <SelectItem value="square">Square Frame</SelectItem>
-              <SelectItem value="rounded">Rounded Frame</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="mt-4">
-          <Label htmlFor="frameLabel" className="dark:text-gray-300">Frame Label</Label>
-          <Input
-            type="text"
-            id="frameLabel"
-            value={frameLabel}
-            onChange={(e) => onFrameLabelChange(e.target.value)}
-            placeholder="Enter frame label"
-          />
-        </div>
-        <div className="mt-4">
-          <Label htmlFor="frameLabelPosition" className="dark:text-gray-300">Frame Label Position</Label>
-          <Select value={frameLabelPosition} onValueChange={onFrameLabelPositionChange}>
-            <SelectTrigger id="frameLabelPosition">
-              <SelectValue placeholder="Choose label position" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="top">Top</SelectItem>
-              <SelectItem value="bottom">Bottom</SelectItem>
-            </SelectContent>
-          </Select>
+        <div className="space-y-4">
+          <div>
+            <Label htmlFor="frame" className="dark:text-gray-300">Frame Style</Label>
+            <Select value={frame} onValueChange={onFrameChange}>
+              <SelectTrigger id="frame">
+                <SelectValue placeholder="Choose frame style" />
+              </SelectTrigger>
+              <SelectContent>
+                {FRAME_STYLES.map(({ value, label }) => (
+                  <SelectItem key={value} value={value}>
+                    {label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {frame !== 'none' && (
+            <div>
+              <div className="flex justify-between">
+                <Label htmlFor="frameLabel" className="dark:text-gray-300">Frame Text</Label>
+                <span className="text-sm text-gray-500 dark:text-gray-400">
+                  {frameLabel.length}/25
+                </span>
+              </div>
+              <Input
+                type="text"
+                id="frameLabel"
+                value={frameLabel}
+                onChange={(e) => {
+                  if (e.target.value.length <= 25) {
+                    onFrameLabelChange(e.target.value)
+                  }
+                }}
+                maxLength={25}
+                placeholder="Enter frame text"
+              />
+            </div>
+          )}
         </div>
       </div>
     </div>

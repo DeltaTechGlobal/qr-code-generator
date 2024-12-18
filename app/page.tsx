@@ -69,9 +69,8 @@ export default function QRCodeGenerator() {
   const [qrData, setQRData] = useState('')
   const [color, setColor] = useState('#000000')
   const [bgColor, setBgColor] = useState('#FFFFFF')
-  const [frame, setFrame] = useState('rounded')
+  const [frame, setFrame] = useState('bottom-frame')
   const [frameLabel, setFrameLabel] = useState('Scan Me')
-  const [frameLabelPosition, setFrameLabelPosition] = useState<'top' | 'bottom'>('bottom')
   const [logo, setLogo] = useState<string | undefined>(undefined)
   const [formData, setFormData] = useState<FormDataType>({
     wifiHidden: false,
@@ -126,7 +125,6 @@ export default function QRCodeGenerator() {
                   bgColor={bgColor} 
                   frame={frame} 
                   frameLabel={frameLabel}
-                  frameLabelPosition={frameLabelPosition}
                   logo={formData.logo}
                 />
                 <Customization
@@ -134,14 +132,12 @@ export default function QRCodeGenerator() {
                   bgColor={bgColor}
                   frame={frame}
                   frameLabel={frameLabel}
-                  frameLabelPosition={frameLabelPosition}
                   type={selectedType}
                   paymentType={formData.paymentType}
                   onColorChange={setColor}
                   onBgColorChange={setBgColor}
                   onFrameChange={setFrame}
                   onFrameLabelChange={setFrameLabel}
-                  onFrameLabelPositionChange={setFrameLabelPosition}
                   onLogoChange={setLogo}
                   formData={formData}
                   setFormData={setFormData}

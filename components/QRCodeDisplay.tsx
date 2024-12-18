@@ -15,8 +15,7 @@ interface QRCodeDisplayProps {
   bgColor: string
   frame: string
   frameLabel: string
-  frameLabelPosition: 'top' | 'bottom'
-  logo?: string | null
+  logo?: string | undefined
 }
 
 export function QRCodeDisplay({
@@ -25,13 +24,48 @@ export function QRCodeDisplay({
   bgColor,
   frame,
   frameLabel,
-  frameLabelPosition,
   logo
 }: QRCodeDisplayProps) {
   const [qrImageBlob, setQrImageBlob] = useState<Blob | null>(null)
   const [downloadFormat, setDownloadFormat] = useState<'png' | 'pdf'>('png')
   const [downloadSize, setDownloadSize] = useState<string>('300')
   const qrRef = useRef<HTMLDivElement>(null)
+
+  const getFrameStyles = () => {
+    switch (frame) {
+      case 'bottom-frame':
+      case 'top-frame':
+        return {
+          border: `4px solid ${color}`,
+          borderRadius: '0.5rem',
+          labelPosition: frame.startsWith('top') ? 'top' : 'bottom',
+          labelStyle: 'frame'
+        }
+      case 'bottom-tooltip':
+        return {
+          border: `2px solid ${color}`,
+          borderRadius: '0.5rem',
+          labelPosition: 'bottom',
+          labelStyle: 'tooltip'
+        }
+      case 'top-header':
+        return {
+          border: 'none',
+          borderRadius: '0.5rem',
+          labelPosition: 'top',
+          labelStyle: 'header'
+        }
+      default:
+        return {
+          border: `2px solid ${color}`,
+          borderRadius: '0.5rem',
+          labelPosition: 'none',
+          labelStyle: 'none'
+        }
+    }
+  }
+
+  const frameStyles = getFrameStyles()
 
   const generateQRImage = async (format: 'png' | 'pdf', size: number) => {
     if (!qrRef.current || !value) return null
@@ -48,7 +82,7 @@ export function QRCodeDisplay({
         allowTaint: true,
         width: qrRef.current.offsetWidth,
         height: qrRef.current.offsetHeight + (padding * 2),
-        y: frameLabelPosition === 'top' ? -padding : 0,
+        y: frameStyles.labelPosition === 'top' ? -padding : 0,
       })
 
       if (format === 'pdf') {
@@ -92,35 +126,35 @@ export function QRCodeDisplay({
 
   return (
     <div className="flex flex-col items-center">
-      <div 
-        className={`
-          relative 
-          ${frameLabelPosition === 'top' ? 'mt-12' : ''} 
-          transition-all duration-300 ease-in-out
-          ${value ? 'opacity-100 scale-100' : 'opacity-50 scale-95'}
-        `}
-      >
-        <div 
+      <div className={`relative ${frameStyles.labelPosition === 'top' ? 'mt-12' : ''}`}>
+        <div
           ref={qrRef}
           id="qr-container"
-          className="relative bg-white"
+          className={`
+            relative bg-white
+            ${frameStyles.labelStyle === 'header' ? 'shadow-lg' : ''}
+          `}
           style={{ 
             padding: '1rem',
-            ...(frame !== 'none' && {
-              border: `4px solid ${color}`,
-              borderRadius: frame === 'rounded' ? '0.5rem' : '0',
-            })
+            border: frameStyles.border,
+            borderRadius: frameStyles.labelStyle === 'header' ? '0 0 0.5rem 0.5rem' : '0.5rem',
+            boxShadow: frame === 'none' ? 'none' : '0 2px 10px rgba(0,0,0,0.1)'
           }}
         >
-          {frame !== 'none' && frameLabel && frameLabelPosition === 'top' && (
+          {/* Top Label */}
+          {frame !== 'none' && frameLabel && frameStyles.labelPosition === 'top' && (
             <div 
-              className="absolute -top-10 left-0 right-0 flex items-center justify-center text-lg font-bold bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded"
-              style={{ height: '40px' }}
+              className={`absolute -top-10 left-0 right-0 flex items-center justify-center text-lg font-bold
+                ${frameStyles.labelStyle === 'header' 
+                  ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-t-lg h-14 -mt-4'
+                  : 'bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg shadow-lg h-10'
+                }`}
             >
               {frameLabel}
             </div>
           )}
-          
+
+          {/* QR Code */}
           <div className="relative w-64 h-64">
             <QRCode
               value={value || ''}
@@ -137,12 +171,25 @@ export function QRCodeDisplay({
             />
           </div>
 
-          {frame !== 'none' && frameLabel && frameLabelPosition === 'bottom' && (
+          {/* Bottom Label */}
+          {frame !== 'none' && frameLabel && frameStyles.labelPosition === 'bottom' && (
             <div 
-              className="absolute -bottom-10 left-0 right-0 flex items-center justify-center text-lg font-bold bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded"
-              style={{ height: '40px' }}
+              className={`absolute -bottom-10 left-0 right-0 flex items-center justify-center text-lg font-bold
+                ${frameStyles.labelStyle === 'tooltip' 
+                  ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg shadow-lg w-auto mx-auto px-6 transform translate-y-2'
+                  : 'bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg shadow-lg'
+                }`}
+              style={{ 
+                height: '40px'
+              }}
             >
               {frameLabel}
+              {frameStyles.labelStyle === 'tooltip' && (
+                <div
+                  className="absolute -top-2 left-1/2 transform -translate-x-1/2 -translate-y-1/2
+                    border-8 border-transparent border-b-blue-600"
+                />
+              )}
             </div>
           )}
         </div>
@@ -150,7 +197,7 @@ export function QRCodeDisplay({
 
       <div className={`
         flex flex-col gap-4 w-full max-w-md mx-auto
-        ${frameLabelPosition === 'bottom' ? 'mt-20' : 'mt-12'}
+        ${frameStyles.labelPosition === 'bottom' ? 'mt-20' : 'mt-12'}
       `}>
         {/* Format and Size Controls Row */}
         <div className="flex justify-center gap-4">
