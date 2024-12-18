@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
 import { Input } from "@/components/ui/input"
 import Image from 'next/image'
-import { FormDataType } from '@/app/types'
+import { FormDataType } from '@/types'
 import { Upload } from 'lucide-react'
 import { useToast } from "@/hooks/use-toast"
 

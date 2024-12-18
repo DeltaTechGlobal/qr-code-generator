@@ -38,6 +38,8 @@ export interface FormDataType {
   // Email fields
   subject?: string
   body?: string
+
+  // Meeting fields
   meetingId?: string
 
   // Payment fields

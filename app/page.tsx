@@ -2,11 +2,11 @@
 
 import { useState } from 'react'
 import { Card, CardContent } from "@/components/ui/card"
-import { TypeSelector } from './components/TypeSelector'
-import { DynamicForm } from '@/app/components/DynamicForm'
+import { TypeSelector } from '@/components/TypeSelector'
+import { DynamicForm } from '@/components/DynamicForm'
 import { QRCodeDisplay } from '@/components/QRCodeDisplay'
-import { Customization } from './components/Customization'
-import { ThemeToggle } from './components/ThemeToggle'
+import { Customization } from '@/components/Customization'
+import { ThemeToggle } from '@/components/ThemeToggle'
 import { Footer } from '@/components/Footer'
 import { Logo } from '@/components/Logo'
 
