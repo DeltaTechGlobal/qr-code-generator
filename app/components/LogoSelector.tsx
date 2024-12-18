@@ -70,7 +70,7 @@ export function LogoSelector({ type, paymentType, onLogoChange, formData }: Logo
       const defaultLogo = getDefaultLogo()
       setUseCustomLogo(defaultLogo !== formData.logo)
     }
-  }, [type, paymentType, formData, getDefaultLogo])
+  }, [type, paymentType, formData])
 
   const handleLogoToggle = (checked: boolean) => {
     setUseLogo(checked)
@@ -88,10 +88,14 @@ export function LogoSelector({ type, paymentType, onLogoChange, formData }: Logo
   const handleCustomLogoToggle = (checked: boolean) => {
     setUseCustomLogo(checked)
     if (!checked) {
+      // When turning off custom logo, revert to default logo
       const defaultLogo = getDefaultLogo()
       if (defaultLogo) {
         onLogoChange(defaultLogo)
       }
+    } else {
+      // When turning on custom logo, clear the current logo to prompt file upload
+      onLogoChange(undefined)
     }
   }
 
