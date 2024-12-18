@@ -1,6 +1,6 @@
 "use client"
 
-import { Card, CardContent } from "@/components/ui/card"
+import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import {
   Accordion,
   AccordionContent,
@@ -16,22 +16,64 @@ import {
   Users, 
   Scan, 
   HelpCircle,
-  CheckCircle2
+  CheckCircle2,
+  BookOpen,
+  Sparkles,
+  ArrowRight
 } from "lucide-react"
 
 export function QRCodeInfo() {
   return (
     <Card className="w-full max-w-4xl bg-white dark:bg-gray-800 shadow-xl rounded-xl overflow-hidden">
+      <CardHeader className="pb-8 text-center border-b border-gray-200 dark:border-gray-700 bg-gradient-to-br from-blue-50 to-purple-50 dark:from-gray-800 dark:to-gray-900">
+        <div className="flex justify-center mb-4">
+          <div className="p-3 rounded-full bg-blue-100 dark:bg-blue-900/30">
+            <BookOpen className="h-8 w-8 text-blue-600 dark:text-blue-400" />
+          </div>
+        </div>
+        <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400">
+          Learn About QR Codes
+        </h1>
+        <p className="mt-3 text-gray-600 dark:text-gray-400 max-w-xl mx-auto">
+          Discover everything you need to know about QR codes and how they can transform your digital interactions
+        </p>
+      </CardHeader>
       <CardContent className="p-8">
         <div className="space-y-8">
-          {/* Hero Section */}
-          <section className="text-center space-y-4 pb-6 border-b border-gray-200 dark:border-gray-700">
-            <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400">
-              About QR Codes
-            </h2>
-            <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto leading-relaxed">
-              QR codes (Quick Response codes) are two-dimensional barcodes that revolutionize how we share information. Created in 1994 by Denso Wave, they've become an integral part of our digital world, enabling instant access to data through simple scans.
-            </p>
+          {/* Enhanced Hero Section */}
+          <section className="relative p-6 rounded-2xl bg-gradient-to-br from-blue-50 to-purple-50 dark:from-gray-800/50 dark:to-gray-900/50 border border-gray-200 dark:border-gray-700">
+            <div className="absolute top-0 right-0 p-4">
+              <Sparkles className="h-6 w-6 text-purple-500 animate-pulse" />
+            </div>
+            
+            <div className="max-w-3xl mx-auto space-y-6">
+              <h2 className="text-3xl font-bold text-center bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400">
+                About QR Codes
+              </h2>
+              
+              <p className="text-gray-600 dark:text-gray-400 text-lg leading-relaxed text-center">
+                QR codes (Quick Response codes) are two-dimensional barcodes that revolutionize how we share information. Created in 1994 by Denso Wave, they've become an integral part of our digital world, enabling instant access to data through simple scans.
+              </p>
+
+              <div className="flex justify-center gap-4 pt-4">
+                <div className="flex items-center gap-2 text-sm text-blue-600 dark:text-blue-400">
+                  <span className="font-medium">Instant Access</span>
+                  <ArrowRight className="h-4 w-4" />
+                </div>
+                <div className="flex items-center gap-2 text-sm text-purple-600 dark:text-purple-400">
+                  <span className="font-medium">Universal Compatibility</span>
+                  <ArrowRight className="h-4 w-4" />
+                </div>
+                <div className="flex items-center gap-2 text-sm text-indigo-600 dark:text-indigo-400">
+                  <span className="font-medium">Versatile Use</span>
+                  <ArrowRight className="h-4 w-4" />
+                </div>
+              </div>
+            </div>
+
+            {/* Visual Enhancement Elements */}
+            <div className="absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-br from-blue-500/10 to-transparent rounded-full blur-2xl" />
+            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-purple-500/10 to-transparent rounded-full blur-2xl" />
           </section>
 
           {/* Key Benefits Section */}

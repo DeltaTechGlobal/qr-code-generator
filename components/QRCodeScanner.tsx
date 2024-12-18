@@ -142,13 +142,10 @@ export function QRCodeScanner() {
 
   return (
     <Card className="w-full max-w-4xl bg-white dark:bg-gray-800 shadow-xl rounded-xl overflow-hidden">
-      <CardHeader className="border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
-        <div className="flex items-center gap-2">
-          <ScanLine className="h-5 w-5 text-blue-500" />
-          <h2 className="text-lg font-semibold">QR Code Scanner</h2>
-        </div>
-        <p className="text-sm text-gray-600 dark:text-gray-400">
-          Upload a QR code image or drag and drop to scan
+      <CardHeader>
+        <h1 className="text-2xl font-bold">QR Code Scanner</h1>
+        <p className="text-gray-600 dark:text-gray-400">
+          Upload or drag and drop a QR code image to scan instantly
         </p>
       </CardHeader>
       

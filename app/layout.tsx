@@ -3,14 +3,11 @@ import { Inter } from 'next/font/google'
 import './globals.css'
 import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/toaster"
+import { generateMetadata, sectionMetadata } from '@/lib/metadata'
 
 const inter = Inter({ subsets: ['latin'] })
 
-export const metadata: Metadata = {
-  title: 'QR Code Generator',
-  description: 'Generate customizable QR codes for various purposes',
-  metadataBase: new URL('https://generateqrcode.online'),
-}
+export const metadata: Metadata = generateMetadata(sectionMetadata.generator)
 
 export default function RootLayout({
   children,
@@ -19,6 +16,31 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        {/* Structured Data for Rich Results */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebApplication",
+              "name": "QR Code Generator",
+              "applicationCategory": "UtilityApplication",
+              "operatingSystem": "Web Browser",
+              "offers": {
+                "@type": "Offer",
+                "price": "0",
+                "priceCurrency": "USD"
+              },
+              "featureList": [
+                "QR Code Generation",
+                "QR Code Scanning",
+                "Educational Resources"
+              ],
+            })
+          }}
+        />
+      </head>
       <body className={inter.className}>
         <ThemeProvider
           attribute="class"

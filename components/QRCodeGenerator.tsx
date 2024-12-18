@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from 'react'
-import { Card, CardContent } from "@/components/ui/card"
+import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { TypeSelector } from '@/components/TypeSelector'
 import { DynamicForm } from '@/components/DynamicForm'
 import { QRCodeDisplay } from '@/components/QRCodeDisplay'
@@ -81,6 +81,12 @@ export function QRCodeGenerator() {
 
   return (
     <Card className="w-full max-w-4xl bg-white dark:bg-gray-800 shadow-xl rounded-xl overflow-hidden">
+      <CardHeader>
+        <h1 className="text-2xl font-bold">Create Your QR Code</h1>
+        <p className="text-gray-600 dark:text-gray-400">
+          Generate custom QR codes for various purposes with our free tool
+        </p>
+      </CardHeader>
       <CardContent className="p-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative">
           <div>
