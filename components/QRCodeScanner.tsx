@@ -4,7 +4,11 @@ import { useState, useCallback } from 'react'
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { useToast } from "@/hooks/use-toast"
-import { Upload, ScanLine, AlertCircle, XCircle, FileWarning } from 'lucide-react'
+import { 
+  Upload, ScanLine, AlertCircle, XCircle, FileWarning, Globe, Mail, Wifi, Phone, 
+  CreditCard, FileText, Calendar, MapPin, MessageSquare, Store, Video, 
+  CreditCard as PaymentIcon, Twitter, User, DollarSign, Bitcoin, Wallet
+} from 'lucide-react'
 import jsQR from 'jsqr'
 
 interface ScanError {
@@ -12,16 +16,376 @@ interface ScanError {
   message: string
 }
 
+interface QRCodeExplanation {
+  type: 'url' | 'email' | 'phone' | 'wifi' | 'text' | 'vcard' | 'event' | 
+        'location' | 'sms' | 'app_store' | 'zoom' | 'payment' | 'tweet' | 
+        'social' | 'unknown'
+  title: string
+  description: string
+  icon: React.ReactNode
+  action?: {
+    label: string
+    url: string
+  }
+}
+
+function parseICalEvent(data: string) {
+  const summary = data.match(/SUMMARY:(.*?)(?:\r\n|\n|$)/)?.[1] || ''
+  const location = data.match(/LOCATION:(.*?)(?:\r\n|\n|$)/)?.[1] || ''
+  const description = data.match(/DESCRIPTION:(.*?)(?:\r\n|\n|$)/)?.[1] || ''
+  
+  // Parse start and end dates
+  const startStr = data.match(/DTSTART:(\d{8}T\d{6}Z)/)?.[1]
+  const endStr = data.match(/DTEND:(\d{8}T\d{6}Z)/)?.[1]
+  
+  let startDate: Date | null = null
+  let endDate: Date | null = null
+  
+  if (startStr) {
+    startDate = new Date(
+      parseInt(startStr.slice(0, 4)), // year
+      parseInt(startStr.slice(4, 6)) - 1, // month (0-based)
+      parseInt(startStr.slice(6, 8)), // day
+      parseInt(startStr.slice(9, 11)), // hour
+      parseInt(startStr.slice(11, 13)), // minute
+      parseInt(startStr.slice(13, 15)) // second
+    )
+  }
+  
+  if (endStr) {
+    endDate = new Date(
+      parseInt(endStr.slice(0, 4)),
+      parseInt(endStr.slice(4, 6)) - 1,
+      parseInt(endStr.slice(6, 8)),
+      parseInt(endStr.slice(9, 11)),
+      parseInt(endStr.slice(11, 13)),
+      parseInt(endStr.slice(13, 15))
+    )
+  }
+
+  return {
+    summary,
+    location,
+    description,
+    startDate,
+    endDate
+  }
+}
+
+function parsePaymentData(data: string): { type: string; address: string; amount?: string } {
+  // PayPal
+  if (data.startsWith('https://www.paypal.com/paypalme/')) {
+    const address = data.replace('https://www.paypal.com/paypalme/', '').split('/')[0]
+    const amount = data.split('/')[1]
+    return { type: 'PayPal', address, amount }
+  }
+  
+  // Cash App
+  if (data.startsWith('https://cash.app/$')) {
+    const address = data.replace('https://cash.app/$', '').split('/')[0]
+    const amount = data.split('/')[1]
+    return { type: 'Cash App', address, amount }
+  }
+  
+  // Venmo
+  if (data.startsWith('https://venmo.com/')) {
+    const address = data.replace('https://venmo.com/', '').split('?')[0]
+    const amount = new URLSearchParams(data.split('?')[1]).get('amount') || undefined
+    return { type: 'Venmo', address, amount }
+  }
+  
+  // Google Pay
+  if (data.startsWith('https://pay.google.com/payments')) {
+    const params = new URLSearchParams(data.split('?')[1])
+    return { 
+      type: 'Google Pay', 
+      address: params.get('phone') || '', 
+      amount: params.get('amount') || undefined 
+    }
+  }
+  
+  // WeChat Pay
+  if (data.startsWith('wxp://')) {
+    const address = data.replace('wxp://', '').split('?')[0]
+    const amount = new URLSearchParams(data.split('?')[1]).get('amount') || undefined
+    return { type: 'WeChat Pay', address, amount }
+  }
+  
+  // Alipay
+  if (data.startsWith('alipay://')) {
+    const params = new URLSearchParams(data.split('?')[1])
+    return { 
+      type: 'Alipay', 
+      address: params.get('account') || '', 
+      amount: params.get('amount') || undefined 
+    }
+  }
+  
+  // Cryptocurrency formats
+  const cryptoMatch = data.match(/^(bitcoin|ethereum|litecoin|dogecoin|solana|tether|usdc):([^?]+)(\?amount=(.+))?/)
+  if (cryptoMatch) {
+    return {
+      type: cryptoMatch[1].charAt(0).toUpperCase() + cryptoMatch[1].slice(1),
+      address: cryptoMatch[2],
+      amount: cryptoMatch[4]
+    }
+  }
+  
+  return { type: 'Unknown', address: '' }
+}
+
+function analyzeQRContent(data: string): QRCodeExplanation {
+  // Event detection (iCal format)
+  if (/^BEGIN:VCALENDAR/i.test(data)) {
+    const eventDetails = parseICalEvent(data)
+    const formatDate = (date: Date | null) => {
+      if (!date) return 'Not specified'
+      return date.toLocaleString(undefined, {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      })
+    }
+
+    let description = `Event: ${eventDetails.summary || 'Untitled Event'}\n`
+    description += `When: ${formatDate(eventDetails.startDate)}`
+    if (eventDetails.endDate) {
+      description += ` to ${formatDate(eventDetails.endDate)}`
+    }
+    if (eventDetails.location) {
+      description += `\nLocation: ${eventDetails.location}`
+    }
+    if (eventDetails.description) {
+      description += `\nDetails: ${eventDetails.description}`
+    }
+
+    // Generate Google Calendar link
+    const googleCalParams = new URLSearchParams({
+      action: 'TEMPLATE',
+      text: eventDetails.summary || 'Untitled Event',
+      dates: `${eventDetails.startDate?.toISOString().replace(/[-:]/g, '').slice(0, -5)}Z/${
+        eventDetails.endDate?.toISOString().replace(/[-:]/g, '').slice(0, -5)}Z`,
+      details: eventDetails.description || '',
+      location: eventDetails.location || ''
+    })
+
+    return {
+      type: 'event',
+      title: 'Calendar Event',
+      description: description.trim(),
+      icon: <Calendar className="h-5 w-5 text-orange-500" />,
+      action: {
+        label: 'Add to Calendar',
+        url: `https://calendar.google.com/calendar/render?${googleCalParams.toString()}`
+      }
+    }
+  }
+
+  // vCard detection (enhanced)
+  if (/^BEGIN:VCARD/i.test(data)) {
+    const name = data.match(/FN:(.*)/i)?.[1] || ''
+    return {
+      type: 'vcard',
+      title: 'Contact Information',
+      description: `This QR code contains contact information for ${name || 'someone'} in vCard format.`,
+      icon: <CreditCard className="h-5 w-5 text-indigo-500" />
+    }
+  }
+
+  // Wi-Fi detection (enhanced)
+  if (/^WIFI:/i.test(data)) {
+    const ssid = data.match(/SSID:(.*?);/i)?.[1] || ''
+    return {
+      type: 'wifi',
+      title: 'Wi-Fi Credentials',
+      description: `This QR code contains Wi-Fi credentials for network "${ssid || 'Unknown'}"`,
+      icon: <Wifi className="h-5 w-5 text-amber-500" />
+    }
+  }
+
+  // Location detection
+  if (/^geo:/i.test(data)) {
+    return {
+      type: 'location',
+      title: 'Geographic Location',
+      description: 'This QR code links to a geographical location on a map.',
+      icon: <MapPin className="h-5 w-5 text-red-500" />,
+      action: {
+        label: 'View on Map',
+        url: `https://www.google.com/maps?q=${encodeURIComponent(data.replace('geo:', ''))}`
+      }
+    }
+  }
+
+  // SMS detection
+  if (/^smsto:/i.test(data)) {
+    const number = data.match(/^smsto:(.*?):/i)?.[1] || ''
+    return {
+      type: 'sms',
+      title: 'SMS Message',
+      description: `This QR code contains an SMS message template for ${number}`,
+      icon: <MessageSquare className="h-5 w-5 text-green-500" />
+    }
+  }
+
+  // App Store detection
+  if (/^(https?:\/\/(play\.google\.com|apps\.apple\.com))/i.test(data)) {
+    return {
+      type: 'app_store',
+      title: 'App Store Link',
+      description: 'This QR code redirects to an app store link.',
+      icon: <Store className="h-5 w-5 text-purple-500" />,
+      action: {
+        label: 'Visit Store',
+        url: data
+      }
+    }
+  }
+
+  // Zoom meeting detection
+  if (/zoom\.us\//i.test(data)) {
+    return {
+      type: 'zoom',
+      title: 'Zoom Meeting',
+      description: 'This QR code provides a link to join a Zoom meeting.',
+      icon: <Video className="h-5 w-5 text-blue-500" />,
+      action: {
+        label: 'Join Meeting',
+        url: data
+      }
+    }
+  }
+
+  // Payment detection
+  if (/^(bitcoin|ethereum|litecoin|dogecoin|solana|tether|usdc):|^https:\/\/(www\.)?(paypal\.com\/paypalme|cash\.app\/\$|venmo\.com)|^wxp:\/\/|^alipay:\/\//.test(data)) {
+    const paymentInfo = parsePaymentData(data)
+    
+    let description = `This QR code contains payment information for ${paymentInfo.type}`
+    if (paymentInfo.amount) {
+      description += ` with an amount of ${paymentInfo.amount}`
+    }
+    description += `\nPayment Address: ${paymentInfo.address}`
+    
+    const getPaymentIcon = (type: string) => {
+      switch (type.toLowerCase()) {
+        case 'bitcoin':
+        case 'litecoin':
+        case 'dogecoin':
+          return <Bitcoin className="h-5 w-5 text-orange-500" />
+        case 'ethereum':
+        case 'solana':
+        case 'tether':
+        case 'usdc':
+          return <Wallet className="h-5 w-5 text-blue-500" />
+        case 'paypal':
+        case 'cash app':
+        case 'venmo':
+        case 'google pay':
+          return <DollarSign className="h-5 w-5 text-green-500" />
+        default:
+          return <PaymentIcon className="h-5 w-5 text-gray-500" />
+      }
+    }
+    
+    let action;
+    if (data.startsWith('https://')) {
+      action = {
+        label: `Pay with ${paymentInfo.type}`,
+        url: data
+      }
+    }
+    
+    return {
+      type: 'payment',
+      title: `${paymentInfo.type} Payment`,
+      description,
+      icon: getPaymentIcon(paymentInfo.type),
+      ...(action && { action })
+    }
+  }
+
+  // Twitter/X post detection
+  if (/twitter\.com|x\.com/i.test(data)) {
+    return {
+      type: 'tweet',
+      title: 'X/Twitter Post',
+      description: 'This QR code links to a specific tweet or X post.',
+      icon: <Twitter className="h-5 w-5 text-sky-500" />,
+      action: {
+        label: 'View Post',
+        url: data
+      }
+    }
+  }
+
+  // Social media profile detection
+  if (/^https?:\/\/(www\.)?(facebook|instagram|linkedin|tiktok)\.com/i.test(data)) {
+    return {
+      type: 'social',
+      title: 'Social Media Profile',
+      description: 'This QR code links to a social media profile.',
+      icon: <User className="h-5 w-5 text-pink-500" />,
+      action: {
+        label: 'View Profile',
+        url: data
+      }
+    }
+  }
+
+  // URL detection
+  if (/^(https?:\/\/)/i.test(data)) {
+    return {
+      type: 'url',
+      title: 'Website URL',
+      description: `This QR code redirects to the website: ${data}`,
+      icon: <Globe className="h-5 w-5 text-blue-500" />
+    }
+  }
+
+  // Email detection
+  if (/^mailto:/i.test(data) || /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(data)) {
+    return {
+      type: 'email',
+      title: 'Email Address',
+      description: `This QR code contains an email address: ${data.replace('mailto:', '')}`,
+      icon: <Mail className="h-5 w-5 text-purple-500" />
+    }
+  }
+
+  // Phone number detection
+  if (/^tel:/i.test(data) || /^[+]?[(]?[0-9]{3}[)]?[-\s.]?[0-9]{3}[-\s.]?[0-9]{4,6}$/.test(data)) {
+    return {
+      type: 'phone',
+      title: 'Phone Number',
+      description: `This QR code contains a phone number: ${data.replace('tel:', '')}`,
+      icon: <Phone className="h-5 w-5 text-green-500" />
+    }
+  }
+
+  // Default case: treat as text
+  return {
+    type: 'text',
+    title: 'Text Content',
+    description: `This QR code contains the following text message: ${data}`,
+    icon: <FileText className="h-5 w-5 text-gray-500" />
+  }
+}
+
 export function QRCodeScanner() {
   const [scannedData, setScannedData] = useState<string>('')
   const [error, setError] = useState<ScanError | null>(null)
   const [isDragging, setIsDragging] = useState(false)
+  const [explanation, setExplanation] = useState<QRCodeExplanation | null>(null)
   const { toast } = useToast()
 
   const handleImageUpload = useCallback(async (file: File) => {
     // Reset previous states
     setError(null)
     setScannedData('')
+    setExplanation(null)
 
     // Validate file type
     if (!file.type.startsWith('image/')) {
@@ -77,6 +441,7 @@ export function QRCodeScanner() {
 
       if (code) {
         setScannedData(code.data)
+        setExplanation(analyzeQRContent(code.data))
         toast({
           title: "QR Code Scanned Successfully!",
           description: "The QR code content has been extracted.",
@@ -250,6 +615,31 @@ export function QRCodeScanner() {
                   {scannedData}
                 </pre>
               </div>
+
+              {scannedData && explanation && (
+                <div className="mt-6 p-4 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm">
+                  <div className="flex items-center gap-3 mb-3">
+                    {explanation.icon}
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                      {explanation.title}
+                    </h3>
+                  </div>
+                  <p className="text-gray-600 dark:text-gray-300">
+                    {explanation.description}
+                  </p>
+                  {explanation.action && (
+                    <a
+                      href={explanation.action.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-2 inline-flex items-center gap-2 text-sm text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300"
+                    >
+                      {explanation.action.label}
+                      <Globe className="h-4 w-4" />
+                    </a>
+                  )}
+                </div>
+              )}
             </div>
           )}
         </div>
