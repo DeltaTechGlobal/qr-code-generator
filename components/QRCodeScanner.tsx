@@ -7,7 +7,8 @@ import { useToast } from "@/hooks/use-toast"
 import { 
   Upload, ScanLine, AlertCircle, XCircle, FileWarning, Globe, Mail, Wifi, Phone, 
   CreditCard, FileText, Calendar, MapPin, MessageSquare, Store, Video, 
-  CreditCard as PaymentIcon, Twitter, User, DollarSign, Bitcoin, Wallet
+  CreditCard as PaymentIcon, Twitter, User, DollarSign, Bitcoin, Wallet, 
+  ShoppingBag, Chrome 
 } from 'lucide-react'
 import jsQR from 'jsqr'
 
@@ -26,6 +27,7 @@ interface QRCodeExplanation {
   action?: {
     label: string
     url: string
+    onClick?: (e: React.MouseEvent) => void
   }
 }
 
@@ -134,6 +136,60 @@ function parsePaymentData(data: string): { type: string; address: string; amount
   return { type: 'Unknown', address: '' }
 }
 
+function parseWifiData(data: string) {
+  const ssid = data.match(/(?:SSID|S):(.*?);/i)?.[1] || ''
+  const security = data.match(/T:(.*?);/i)?.[1] || 'nopass'
+  const password = data.match(/P:(.*?);/i)?.[1] || ''
+  const hidden = data.match(/H:(.*?);/i)?.[1] === 'true'
+
+  return {
+    ssid: ssid.replace(/"/g, ''),
+    security: security.toUpperCase(),
+    password,
+    hidden
+  }
+}
+
+function detectAppStore(url: string): { 
+  store: 'APPLE' | 'GOOGLE' | 'AMAZON' | 'CHROME' | 'UNKNOWN',
+  label: string,
+  icon: React.ReactNode 
+} {
+  if (url.includes('apps.apple.com')) {
+    return {
+      store: 'APPLE',
+      label: 'Apple App Store',
+      icon: <AppleIcon />
+    }
+  }
+  if (url.includes('play.google.com')) {
+    return {
+      store: 'GOOGLE',
+      label: 'Google Play Store',
+      icon: <Store className="h-5 w-5 text-green-500" />
+    }
+  }
+  if (url.includes('amazon.com/apps')) {
+    return {
+      store: 'AMAZON',
+      label: 'Amazon App Store',
+      icon: <ShoppingBag className="h-5 w-5 text-orange-500" />
+    }
+  }
+  if (url.includes('chrome.google.com/webstore')) {
+    return {
+      store: 'CHROME',
+      label: 'Chrome Web Store',
+      icon: <Chrome className="h-5 w-5 text-blue-500" />
+    }
+  }
+  return {
+    store: 'UNKNOWN',
+    label: 'App Store',
+    icon: <Store className="h-5 w-5 text-gray-500" />
+  }
+}
+
 function analyzeQRContent(data: string): QRCodeExplanation {
   // Event detection (iCal format)
   if (/^BEGIN:VCALENDAR/i.test(data)) {
@@ -197,12 +253,34 @@ function analyzeQRContent(data: string): QRCodeExplanation {
 
   // Wi-Fi detection (enhanced)
   if (/^WIFI:/i.test(data)) {
-    const ssid = data.match(/SSID:(.*?);/i)?.[1] || ''
+    const wifiDetails = parseWifiData(data)
+    
+    let description = `Network Name (SSID): ${wifiDetails.ssid}\n`
+    description += `Security Type: ${wifiDetails.security === 'NOPASS' ? 'Open Network' : wifiDetails.security}\n`
+    if (wifiDetails.password) {
+      description += `Password: ${wifiDetails.password}\n`
+    }
+    if (wifiDetails.hidden) {
+      description += `Note: This is a hidden network`
+    }
+
+    const connectInstructions = `
+To connect to this network:
+1. Open your device's Wi-Fi settings
+2. ${wifiDetails.hidden ? 'Select "Add Hidden Network" or "Other Network"' : `Look for "${wifiDetails.ssid}"`}
+3. ${wifiDetails.password ? `Enter the password shown above` : 'Select "Connect"'}
+    `.trim()
+
     return {
       type: 'wifi',
-      title: 'Wi-Fi Credentials',
-      description: `This QR code contains Wi-Fi credentials for network "${ssid || 'Unknown'}"`,
-      icon: <Wifi className="h-5 w-5 text-amber-500" />
+      title: 'Wi-Fi Network',
+      description: `${description}\n\n${connectInstructions}`,
+      icon: <Wifi className="h-5 w-5 text-amber-500" />,
+      action: wifiDetails.password ? {
+        label: 'Copy Password',
+        url: '#',
+        onClick: undefined
+      } : undefined
     }
   }
 
@@ -232,12 +310,13 @@ function analyzeQRContent(data: string): QRCodeExplanation {
   }
 
   // App Store detection
-  if (/^(https?:\/\/(play\.google\.com|apps\.apple\.com))/i.test(data)) {
+  if (/^https?:\/\/(apps\.apple\.com|play\.google\.com|amazon\.com\/apps|chrome\.google\.com\/webstore)/i.test(data)) {
+    const storeInfo = detectAppStore(data)
     return {
       type: 'app_store',
-      title: 'App Store Link',
-      description: 'This QR code redirects to an app store link.',
-      icon: <Store className="h-5 w-5 text-purple-500" />,
+      title: `${storeInfo.label} Link`,
+      description: `This QR code redirects to an application on the ${storeInfo.label}.`,
+      icon: storeInfo.icon,
       action: {
         label: 'Visit Store',
         url: data
@@ -374,12 +453,42 @@ function analyzeQRContent(data: string): QRCodeExplanation {
   }
 }
 
+const AppleIcon = () => (
+  <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+  </svg>
+)
+
 export function QRCodeScanner() {
   const [scannedData, setScannedData] = useState<string>('')
   const [error, setError] = useState<ScanError | null>(null)
   const [isDragging, setIsDragging] = useState(false)
   const [explanation, setExplanation] = useState<QRCodeExplanation | null>(null)
   const { toast } = useToast()
+
+  const analyzeQRContentWithToast = useCallback((data: string) => {
+    const result = analyzeQRContent(data)
+    
+    if (result.type === 'wifi' && result.action?.label === 'Copy Password') {
+      return {
+        ...result,
+        action: {
+          ...result.action,
+          onClick: (e: React.MouseEvent) => {
+            e.preventDefault()
+            navigator.clipboard.writeText(data.match(/P:(.*?);/i)?.[1] || '')
+            toast({
+              title: "Password Copied",
+              description: "Wi-Fi password has been copied to clipboard.",
+              className: "bg-green-50 dark:bg-green-900 border-green-200",
+            })
+          }
+        }
+      }
+    }
+    
+    return result
+  }, [toast])
 
   const handleImageUpload = useCallback(async (file: File) => {
     // Reset previous states
@@ -441,7 +550,7 @@ export function QRCodeScanner() {
 
       if (code) {
         setScannedData(code.data)
-        setExplanation(analyzeQRContent(code.data))
+        setExplanation(analyzeQRContentWithToast(code.data))
         toast({
           title: "QR Code Scanned Successfully!",
           description: "The QR code content has been extracted.",
@@ -473,7 +582,7 @@ export function QRCodeScanner() {
         URL.revokeObjectURL(objectUrl)
       }
     }
-  }, [toast])
+  }, [toast, analyzeQRContentWithToast])
 
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault()
@@ -632,6 +741,7 @@ export function QRCodeScanner() {
                       href={explanation.action.url}
                       target="_blank"
                       rel="noopener noreferrer"
+                      onClick={explanation.action.onClick}
                       className="mt-2 inline-flex items-center gap-2 text-sm text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300"
                     >
                       {explanation.action.label}
